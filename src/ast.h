@@ -274,7 +274,7 @@ class NodeImpl {
 public:
 	template <typename Derived>
 	NodeImpl(Derived* derived)
-		: type_(Derived::TYPE) {
+	:	type_(Derived::TYPE) {
 		JT_COMP_ASSERT((void*) derived == (NodeImpl*) derived,
 			"Node derived type can't be sliced");
 	}
@@ -385,7 +385,7 @@ std::vector<Var>::const_iterator end(const Seq& s);
 class Modifier {
 public:
 	Modifier(const String& name, Seq args)
-		: name_(name),
+	:	name_(name),
 		args_(args) {}
 
 protected:
@@ -396,7 +396,7 @@ protected:
 class TemplateMod : public Modifier {
 public:
 	TemplateMod(Seq args)
-		: Modifier("Template", args) {}
+	:	Modifier("Template", args) {}
 };
 
 JT_AST_NODE(FuncCall) {
@@ -406,11 +406,11 @@ public:
 	FuncCallImpl() : NodeImpl(this) {}
 
 	FuncCallImpl(const String& func_name)
-		: NodeImpl(this),
+	:	NodeImpl(this),
 		func_name_(func_name) {}
 
 	FuncCallImpl(const String& func_name, Node n1)
-		: NodeImpl(this),
+	:	NodeImpl(this),
 		func_name_(func_name) {
 		flow_->add(n1);
 	}
@@ -460,15 +460,15 @@ public:
 	typedef void(*Store)(...);
 
 	NativeCall()
-		: call_(nullptr), native_func_(nullptr) {}
+	:	call_(nullptr), native_func_(nullptr) {}
 
 	template <typename A1>
 	NativeCall(Var(*native_func)(CallUnit* unit, A1*))
-		: call_(&func_map_seq<A1>), native_func_((Store) native_func) {}
+	:	call_(&func_map_seq<A1>), native_func_((Store) native_func) {}
 
 	template <typename A1, typename A2>
 	NativeCall(Var(*native_func)(CallUnit* unit, A1*, A2*))
-		: call_(&func_map_seq<A1, A2>), native_func_((Store) native_func) {}
+	:	call_(&func_map_seq<A1, A2>), native_func_((Store) native_func) {}
 
 	template <typename A1, typename A2>
 	void set(Var(*native_func)(A1*, A2*)) {
@@ -490,11 +490,10 @@ JT_AST_NODE(NativeFuncCall) {
 public:
 	static const NodeType TYPE = NodeType::NATIVE_FUNC_CALL;
 
-	NativeFuncCallImpl()
-		: NodeImpl(this) {}
+	NativeFuncCallImpl() : NodeImpl(this) {}
 
 	NativeFuncCallImpl(NativeCall f)
-		: NodeImpl(this),
+	:	NodeImpl(this),
 		native_(f) {}
 
 	Seq args() { return args_; }
@@ -556,12 +555,10 @@ protected:
 class AstNodeCalls {
 public:
 	template <class N>
-	void add(N node) {
-	}
+	void add(N node) {}
 
 	template <class N>
-	void call(N node) {
-	}
+	void call(N node) {}
 
 private:
 	//std::vector<>

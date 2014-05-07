@@ -5,7 +5,7 @@
 namespace jt {
 
 Parser::Parser(FuncTermImpl* root, ContextSPtr ctx)
-	: root_(root),
+:	root_(root),
 	ctx_(ctx),
 	pstate_(yypstate_new()) {}
 

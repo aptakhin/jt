@@ -39,23 +39,23 @@ template <class T>
 class TypeStorage {
 public:
 	TypeStorage()
-		: stored_(false),
-		dbg_val_(false) {}
+	:	stored_(false),
+		dbg_val_(nullptr) {}
 
 	TypeStorage(T&& t)
-		: stored_(true) {
+	:	stored_(true) {
 		new (&store_) T(std::move(t));
 		dbg_val_ = cast<const T*>();
 	}
 
 	TypeStorage(const T& t)
-		: stored_(true) {
+	:	stored_(true) {
 		new (&store_) T(t);
 		dbg_val_ = cast<const T*>();
 	}
 
 	TypeStorage(const TypeStorage& t)
-		: stored_(t.stored_) {
+	:	stored_(t.stored_) {
 		if (t.stored_)
 			new (&store_) T(*t), dbg_val_ = cast<const T*>();
 	}
@@ -123,15 +123,15 @@ public:
 	Optional() {}
 
 	explicit Optional(const T& t)
-		: store_(t) {}
+	:	store_(t) {}
 
 	explicit Optional(T&& t)
-		: store_(t) {}
+	:	store_(t) {}
 
 	Optional(NulloptT) {}
 
 	explicit Optional(Optional&& opt)
-		: store_(std::move(opt.store_)) {}
+	:	store_(std::move(opt.store_)) {}
 
 	void operator = (const T& t) {
 		store_.set(t);

@@ -98,7 +98,6 @@ void CallUnit::add_vars(Seq args) {
 	for (auto& arg: args) {
 		auto x = resolve(arg);
 		Term var_term = arg->term();
-
 		stack_.back()->add_named(arg->name(), var_term);
 	}
 }
@@ -183,8 +182,7 @@ Term CallUnit::exec_node(Node node) {
 			tm = *found;
 	}
 	switch (node->type()) {
-	case NodeType::FUNC_CALL:
-	{
+	case NodeType::FUNC_CALL: {
 		auto call = node.impl<FuncCallImpl>();
 		auto impl = tm.impl<FuncTermImpl>();
 		JT_COMP_ASSERT(impl, "No function term impl in function call");
@@ -197,8 +195,7 @@ Term CallUnit::exec_node(Node node) {
 	}
 		break;
 
-	case NodeType::NATIVE_FUNC_CALL:
-	{
+	case NodeType::NATIVE_FUNC_CALL: {
 		auto call = node.impl<NativeFuncCallImpl>();
 		auto push_args = bind(call->args());
 		auto ret = call->do_call(this, push_args);
@@ -207,8 +204,7 @@ Term CallUnit::exec_node(Node node) {
 	}
 		break;
 
-	case NodeType::VAR:
-	{
+	case NodeType::VAR: {
 		auto n = node.impl<VarImpl>();
 		auto calc = resolve(node);
 		tm = calc->term();

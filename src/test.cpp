@@ -81,9 +81,9 @@ Term mapper(Var(*func)(CallUnit*, A1*, A2*), const String& a1name, const String&
 class BaseTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		ctx_ = std::make_shared<Context>(nullptr);
-		root_ = std::make_unique<FuncTermImpl>();
-		run_ = std::make_unique<CallUnit>(nullptr, *root_.get(), ctx_);
+		ctx_    = std::make_shared<Context>(nullptr);
+		root_   = std::make_unique<FuncTermImpl>();
+		run_    = std::make_unique<CallUnit>(nullptr, *root_.get(), ctx_);
 		parser_ = std::make_unique<Parser>(root_.get(), ctx_);
 		setup_std(ctx_);
 	}
@@ -142,14 +142,14 @@ TEST_F(BaseTest, SimplePrint) {
 }
 
 TEST_F(BaseTest, SimplePlus) {
-	auto op_call = FuncCall("op_plus", make_ivar(2), make_ivar(3));
+	auto op_call    = FuncCall("op_plus", make_ivar(2), make_ivar(3));
 	auto print_call = FuncCall("print", op_call);
 	run_->set_flow(Flow(listed({print_call})));
 	test_out("5");
 }
 
 TEST_F(BaseTest, SimpleVar) {
-	auto op_call = FuncCall("op_plus", make_ivar(2), make_ivar(3));
+	auto op_call    = FuncCall("op_plus", make_ivar(2), make_ivar(3));
 	Var pvar;
 	pvar->set_value(op_call);
 	auto print_call = FuncCall("print", pvar);

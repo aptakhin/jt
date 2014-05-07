@@ -16,7 +16,6 @@ enum class ReportLevel {
 
 class Report {
 public:
-
 	Report(ReportLevel level, const char* file, int line, const char* msg)
 	:	level(level), file(file), line(line), msg(msg) {}
 
@@ -61,7 +60,6 @@ protected:
 class Reports {
 public:
 	void add_out(IReportOut* out) { report_out_.push_back(out); }
-
 	void report(const Report& report);
 
 protected:
@@ -73,6 +71,5 @@ extern Reports Rep;
 #define JT_COMP_ERR(msg) { Rep.report(Report(ReportLevel::COMP_ERR, __FILE__, __LINE__, (msg))); _CrtDbgBreak(); }
 #define JT_COMP_ASSERT(expr, msg) if (!(expr)){ JT_COMP_ERR(msg); }
 #define JT_USER_ERR(msg) { Rep.report(Report(ReportLevel::USER_ERR, __FILE__, __LINE__, (msg))); _CrtDbgBreak(); }
-
 
 } // namespace jt {

@@ -8,13 +8,13 @@ Jt uses gyp for generating project files.
 
 Currently testing platform:
 
-- Windows 7 x64, MSVS 13 upd. 1 x86 compiler
+- Windows 7 x64, MSVS 13 upd. 1 x86 compiler (Earlier compiler versions are not supported)
 
 gyp generating:
 
 	gyp jt.gyp --depth=proj/vs13 --generator-output=./proj/vs13 -f msvs -G msvs_version=2013
 	
-Nearest plans (to Dec 2014):
+Now (to Dec 2014):
 
 - more tests
 - good compilation error reporting for user
@@ -22,7 +22,7 @@ Nearest plans (to Dec 2014):
 - continue writing interpreter based on ast, slow but required
 - starting Just-In-Time experiments
 
-Next plans (to June 2015):
+Then (to June 2015):
 
 - stable language syntax, all features implemented for ast
 - planning and implementing some core libraries
