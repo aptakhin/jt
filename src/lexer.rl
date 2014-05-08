@@ -48,11 +48,12 @@ main := |*
 		=> { tok->lex = FIG_CLOSE; fbreak; };
 	'+'
 		=> { tok->lex = PLUS; fbreak; };
+	'*'
+		=> { tok->lex = MUL; fbreak; };
 	'='
 		=> { tok->lex = EQUAL; fbreak; };
-	ws => {
-		tok->lex = SPACE; fbreak;
-	};
+	ws 
+		=> { tok->lex = SPACE; fbreak; };
 
 	newline => {
 		line_beg_ = p + 1; // Skip new line character

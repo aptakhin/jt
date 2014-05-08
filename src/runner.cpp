@@ -28,8 +28,7 @@ Term Context::find_best(const String& name, Seq arg_types, int& best_score) {
 	auto r = terms_named_.equal_range(name);
 	for (auto i = r.first; i != r.second; ++i) {
 		if (arg_types->empty()) {
-			if (best_score == 1)
-				JT_COMP_ERR("Multiply names for empty query");
+			JT_COMP_ASSERT(best_score != 1, "Multiply names for empty query");
 			best_score = 1;
 			return i->second;
 		}
@@ -43,7 +42,7 @@ Term Context::find_best(const String& name, Seq arg_types, int& best_score) {
 	}
 	if (parent_) {
 		int before_score = best_score;
-		Term parents = parent_->find_best(name, arg_types, best_score);
+		auto parents = parent_->find_best(name, arg_types, best_score);
 		if (best_score > before_score)
 			best = parents;
 	}
@@ -85,10 +84,11 @@ CallUnit::CallUnit(CallUnit&& mv)
 
 void CallUnit::set_args(Seq args) {
 	auto v = begin(args);
+	JT_COMP_ASSERT(args->vars().size() == func_.args()->vars().size(), 
+		"Calling function mismatched number of arguments");
 	for (auto& arg: func_.args()) {
-		assert(v != end(args));
 		auto x = resolve((*v));
-		Term var_term = (*v)->term();
+		auto var_term = (*v)->term();
 		stack_.back()->add_named(arg->name(), var_term);
 		++v;
 	}
@@ -97,7 +97,7 @@ void CallUnit::set_args(Seq args) {
 void CallUnit::add_vars(Seq args) {
 	for (auto& arg: args) {
 		auto x = resolve(arg);
-		Term var_term = arg->term();
+		auto var_term = arg->term();
 		stack_.back()->add_named(arg->name(), var_term);
 	}
 }
@@ -119,8 +119,7 @@ Term CallUnit::exec() {
 
 Var CallUnit::bind(Var var) {
 	auto found = stack_.back()->find_named(var->name(), Seq());
-	if (!found)
-		JT_COMP_ERR("Name not found");
+	JT_COMP_ASSERT(found, "Name not found");
 	Var ret;
 	ret->set_name(var->name());
 	ret->set_term(found);

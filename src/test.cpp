@@ -28,12 +28,16 @@ Var jt_plus(CallUnit*, IntTermImpl* a, IntTermImpl* b) {
 	return make_ivar(a->number() + b->number());
 }
 
+Var jt_mul(CallUnit*, IntTermImpl* a, IntTermImpl* b) {
+	return make_ivar(a->number() * b->number());
+}
+
 Var jt_get(CallUnit* unit, StringTermImpl* iname) {
 	return make_var(unit->get_var(iname->str()));
 }
 
 template <typename Ret, typename A1>
-Term mapper(Var(*func)(CallUnit*, A1*), const String& a1name, Seq init_args = Seq()) {
+Term def_func(Var(*func)(CallUnit*, A1*), const String& a1name, Seq init_args = Seq()) {
 	auto func_impl = new FuncTermImpl;
 	{ // Filling arguments for function
 		Seq seq;
@@ -55,7 +59,7 @@ Term mapper(Var(*func)(CallUnit*, A1*), const String& a1name, Seq init_args = Se
 }
 
 template <typename Ret, typename A1, typename A2>
-Term mapper(Var(*func)(CallUnit*, A1*, A2*), const String& a1name, const String& a2name, Seq init_args = Seq()) {
+Term def_func(Var(*func)(CallUnit*, A1*, A2*), const String& a1name, const String& a2name, Seq init_args = Seq()) {
 	auto func_impl = new FuncTermImpl;
 	{ // Filling arguments for function
 		Seq seq;
@@ -93,16 +97,17 @@ protected:
 		Var v = make_ivar((int) &out_);
 		v->set_name("stream");
 		print_init_args->add(v);
-		ctx->add_named("print", mapper<IntTermImpl>(jt_print, "to_print", print_init_args));
-		ctx->add_named("op_plus", mapper<IntTermImpl>(jt_plus, "a", "b"));
-		ctx->add_named("op_get", mapper<IntTermImpl>(jt_get, "unit"));
+		ctx->add_named("print",   def_func<IntTermImpl>(jt_print, "to_print", print_init_args));
+		ctx->add_named("op_plus", def_func<IntTermImpl>(jt_plus,  "a", "b"));
+		ctx->add_named("op_mul",  def_func<IntTermImpl>(jt_mul,   "a", "b"));
+		ctx->add_named("op_get",  def_func<IntTermImpl>(jt_get,   "unit"));
 	}
 
 	void test_out(const String& t_out) {
 		Inferencer inf(*root_.get(), ctx_);
 
 		auto test_info = ::testing::UnitTest::GetInstance()->current_test_info();
-		String name = String() + "tests/" + test_info->name() + ".txt";
+		auto name = String() + "tests/" + test_info->name() + ".txt";
 
 		std::ofstream fout(name.c_str());
 		fout << parser_->str() << std::endl << std::endl;
@@ -201,6 +206,25 @@ TEST_F(BaseTest, Parser41Plus1Circ2) {
 	test_out("42");
 }
 
+// Precedence doesn't work
+//TEST_F(BaseTest, ParserMul) {
+//	parser_->push("x = 1 + 2 * 3;");
+//	call_print("x");
+//	test_out("7");
+//}
+
+TEST_F(BaseTest, ParserMul2) {
+	parser_->push("x = 1 * 2 + 3;");
+	call_print("x");
+	test_out("5");
+}
+
+TEST_F(BaseTest, ParserMul3) {
+	parser_->push("x = 2 * (3 + 4);");
+	call_print("x");
+	test_out("14");
+}
+
 TEST_F(BaseTest, Parser42) {
 	parser_->push("x = 41; y = x + 1;");
 	call_print("y");
@@ -231,10 +255,22 @@ TEST_F(BaseTest, DefFunc4) {
 	test_out("4");
 }
 
+TEST_F(BaseTest, DefFunc4Mul) {
+	parser_->push("def func() int { 2 * 2; } x = func();");
+	call_print("x");
+	test_out("4");
+}
+
 TEST_F(BaseTest, DefFunc22) {
 	parser_->push("def plus2(a int) int { a + 2; } x = plus2(20);");
 	call_print("x");
 	test_out("22");
+}
+
+TEST_F(BaseTest, DefFunc42Mul) {
+	parser_->push("def double(a int) int { a * 2; } x = double(21);");
+	call_print("x");
+	test_out("42");
 }
 
 TEST_F(BaseTest, DefFunc12) {
@@ -257,7 +293,7 @@ TEST_F(BaseTest, DefFunc42) {
 
 int main(int argc, char** argv) {
 	testing::InitGoogleTest(&argc, argv);
-	auto out = std::make_unique<OstreamReportOut>(std::cout);
+	auto out  = std::make_unique<OstreamReportOut>(std::cout);
 	auto out2 = std::make_unique<Win32DbgReportOut>();
 	Rep.add_out(out.get());
 	Rep.add_out(out2.get());

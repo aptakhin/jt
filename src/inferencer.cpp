@@ -10,8 +10,7 @@ Inferencer::Inferencer(FuncTermImpl& root, ContextSPtr ctx)
 
 Term Inferencer::local(Node node) {
 	switch (node->type()) {
-	case NodeType::FLOW:
-	{
+	case NodeType::FLOW: {
 		auto flow = node.impl<FlowImpl>();
 		for (auto& i: flow->flow()) {
 			auto term = local(i);
@@ -21,8 +20,7 @@ Term Inferencer::local(Node node) {
 	}
 		break;
 
-	case NodeType::VAR:
-	{
+	case NodeType::VAR: {
 		auto n = node.impl<VarImpl>();
 		auto tm = n->term();
 		if (!n->term()) {
@@ -48,8 +46,7 @@ Term Inferencer::local(Node node) {
 	}
 		break;
 
-	case NodeType::FUNC_CALL:
-	{
+	case NodeType::FUNC_CALL: {
 		auto n = node.impl<FuncCallImpl>();
 		Seq args;
 		for (auto& i: n->flow()) {

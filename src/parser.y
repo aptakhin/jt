@@ -55,8 +55,13 @@ typedef struct YYLTYPE
 %token FIG_CLOSE
 %token EQUAL
 %token PLUS
+%token MUL
 %token <str> IDENT
 %token <i> NUMBER
+
+%left PLUS
+%left MUL 
+%left EQUAL
 
 %parse-param { jt::ParseContext* ctx };
 
@@ -133,6 +138,10 @@ SubExpr:
 	| SubExpr PLUS AtomExpr {
 		printf("SubExpr + AtomExpr\n");
 		ctx->put_func_call_all("op_plus", 2);
+	}
+	| SubExpr MUL AtomExpr {
+		printf("SubExpr * AtomExpr\n");
+		ctx->put_func_call_all("op_mul", 2);
 	}
 
 FuncDef:
