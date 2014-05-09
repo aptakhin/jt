@@ -103,7 +103,9 @@ protected:
 		ctx->add_named("op_get",  def_func<IntTermImpl>(jt_get,   "unit"));
 	}
 
-	void test_out(const String& t_out) {
+#define TEST_OUT(t_out) { exec(); ASSERT_EQ(t_out, out_.str()); }
+
+	void exec() {
 		Inferencer inf(*root_.get(), ctx_);
 
 		auto test_info = ::testing::UnitTest::GetInstance()->current_test_info();
@@ -121,7 +123,6 @@ protected:
 		print.visit("", root_->flow());
 
 		run_->exec();
-		ASSERT_EQ(t_out, out_.str());
 	}
 
 	void call_print(const String& t_out) {
@@ -143,14 +144,14 @@ protected:
 TEST_F(BaseTest, SimplePrint) {
 	auto func_call = FuncCall("print", make_ivar(5));
 	run_->set_flow(Flow(listed({func_call})));
-	test_out("5");
+	TEST_OUT("5");
 }
 
 TEST_F(BaseTest, SimplePlus) {
 	auto op_call    = FuncCall("op_plus", make_ivar(2), make_ivar(3));
 	auto print_call = FuncCall("print", op_call);
 	run_->set_flow(Flow(listed({print_call})));
-	test_out("5");
+	TEST_OUT("5");
 }
 
 TEST_F(BaseTest, SimpleVar) {
@@ -159,7 +160,7 @@ TEST_F(BaseTest, SimpleVar) {
 	pvar->set_value(op_call);
 	auto print_call = FuncCall("print", pvar);
 	run_->set_flow(Flow(listed({print_call})));
-	test_out("5");
+	TEST_OUT("5");
 }
 
 TEST(Common, Lexer) {
@@ -179,116 +180,116 @@ TEST(Common, Lexer) {
 TEST_F(BaseTest, Parser41) {
 	parser_->push("x = 41;");
 	call_print("x");
-	test_out("41");
+	TEST_OUT("41");
 }
 
 TEST_F(BaseTest, Parser41Circ) {
 	parser_->push("x = (41);");
 	call_print("x");
-	test_out("41");
+	TEST_OUT("41");
 }
 
 TEST_F(BaseTest, Parser41Plus1) {
 	parser_->push("x = 41 + 1;");
 	call_print("x");
-	test_out("42");
+	TEST_OUT("42");
 }
 
 TEST_F(BaseTest, Parser41Plus1Circ1) {
 	parser_->push("x = (41 + 1);");
 	call_print("x");
-	test_out("42");
+	TEST_OUT("42");
 }
 
 TEST_F(BaseTest, Parser41Plus1Circ2) {
 	parser_->push("x = ((41) + (1));");
 	call_print("x");
-	test_out("42");
+	TEST_OUT("42");
 }
 
-// Precedence doesn't work
+//// Precedence doesn't work
 //TEST_F(BaseTest, ParserMul) {
 //	parser_->push("x = 1 + 2 * 3;");
 //	call_print("x");
-//	test_out("7");
+//	TEST_OUT("7");
 //}
 
 TEST_F(BaseTest, ParserMul2) {
 	parser_->push("x = 1 * 2 + 3;");
 	call_print("x");
-	test_out("5");
+	TEST_OUT("5");
 }
 
 TEST_F(BaseTest, ParserMul3) {
 	parser_->push("x = 2 * (3 + 4);");
 	call_print("x");
-	test_out("14");
+	TEST_OUT("14");
 }
 
 TEST_F(BaseTest, Parser42) {
 	parser_->push("x = 41; y = x + 1;");
 	call_print("y");
-	test_out("42");
+	TEST_OUT("42");
 }
 
 TEST_F(BaseTest, Parser43) {
 	parser_->push("x = 41; y = x + 1; z = y + 1;");
 	call_print("z");
-	test_out("43");
+	TEST_OUT("43");
 }
 
 TEST_F(BaseTest, Parser44) {
 	parser_->push("x = 41; y = op_plus(x + 1, 2);");
 	call_print("y");
-	test_out("44");
+	TEST_OUT("44");
 }
 
 TEST_F(BaseTest, DefFunc2) {
 	parser_->push("def func() int { 2; } x = func();");
 	call_print("x");
-	test_out("2");
+	TEST_OUT("2");
 }
 
 TEST_F(BaseTest, DefFunc4) {
 	parser_->push("def func() int { 2 + 2; } x = func();");
 	call_print("x");
-	test_out("4");
+	TEST_OUT("4");
 }
 
 TEST_F(BaseTest, DefFunc4Mul) {
 	parser_->push("def func() int { 2 * 2; } x = func();");
 	call_print("x");
-	test_out("4");
+	TEST_OUT("4");
 }
 
 TEST_F(BaseTest, DefFunc22) {
 	parser_->push("def plus2(a int) int { a + 2; } x = plus2(20);");
 	call_print("x");
-	test_out("22");
+	TEST_OUT("22");
 }
 
 TEST_F(BaseTest, DefFunc42Mul) {
 	parser_->push("def double(a int) int { a * 2; } x = double(21);");
 	call_print("x");
-	test_out("42");
+	TEST_OUT("42");
 }
 
 TEST_F(BaseTest, DefFunc12) {
 	parser_->push("def plus2(a int) int { a + 2; } x = plus2(1) + plus2(2) + plus2(3);");
 	call_print("x");
-	test_out("12");
+	TEST_OUT("12");
 }
 
 TEST_F(BaseTest, DefFunc12Circ) {
 	parser_->push("def plus2(a int) int { a + 2; } x = (plus2(1) + ((plus2(2)) + plus2(3)));");
 	call_print("x");
-	test_out("12");
+	TEST_OUT("12");
 }
 
 TEST_F(BaseTest, DefFunc42) {
 	parser_->push("def func(a int) int { def plus2(b int) int { b + 2; } a + plus2(a); } x = func(20);");
 	call_print("x");
-	test_out("42");
+	TEST_OUT("42");
 }
 
 int main(int argc, char** argv) {
