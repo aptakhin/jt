@@ -96,6 +96,11 @@ Parameters:
 		printf("(ParametersInt)\n"); 
 	}
 
+Returned:
+	| IDENT {
+		ctx->func_def_ret($1);
+	}
+
 TupleExprInt:
 	| SubExpr {
 		printf("ParamExpr\n"); 
@@ -149,9 +154,13 @@ FuncDef:
 		printf("Func %s def start;\n", $2);
 		ctx->func_def($2);
 	}
-	Parameters IDENT {
-		printf("Parameters and Rettype\n");
-		ctx->func_def_param_end($5);
+	Parameters { 
+		printf("Parameters\n");
+		ctx->func_def_param_end();
+	} 
+	Returned {
+		printf("Rettype\n");
+		ctx->func_def_ret_end();
 	}
 	FIG_OPEN {
 		printf("Func flow begin\n");
@@ -183,6 +192,6 @@ Expr:
 int yyerror(jt::ParseContext* ctx, char* s)
 {
 	printf("yyerror: %s\n",s);
-	jt::Rep.report(jt::Report(jt::ReportLevel::USER_ERR, __FILE__, __LINE__, (s))); 
+	ctx->show_report(s);
 	return 0;
 }

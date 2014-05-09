@@ -365,6 +365,18 @@ TEST_F(BaseTest, DefFunc42) {
 	TEST_OUT("42");
 }
 
+TEST_F(BaseTest, DefFuncI) {
+	parser_->push("def func(a) { a; } x = func(31);");
+	call_print("x");
+	TEST_OUT("31");
+}
+
+TEST_F(BaseTest, DefFuncI2) {
+	parser_->push("def func(a) { a + 2; } x = func(31);");
+	call_print("x");
+	TEST_OUT("33");
+}
+
 class FileTest : private BaseEnv {
 public:
 	FileTest(const char* filename)
@@ -377,8 +389,7 @@ public:
 		if (!res)
 			return false;
 		size_t offset = strlen(to);
-		for (size_t i = offset; i < line.size(); ++i)
-		{
+		for (size_t i = offset; i < line.size(); ++i) {
 			if (line[i] != '-')
 				JT_USER_ERR("Invalid characters");
 		}
@@ -409,8 +420,7 @@ public:
 				continue;
 			}
 
-			switch (state)
-			{
+			switch (state) {
 			case SOURCE:
 				parser_->push(line + "\n");
 				break;
@@ -421,7 +431,6 @@ public:
 				out += line;
 				break;
 			}
-
 		}
 
 		TEST_OUT(out);

@@ -39,7 +39,7 @@ protected:
 
 class ParseContext {
 public:
-	ParseContext();
+	void show_report(const char* s);
 
 	void def(const String& n);
 	void def_end();
@@ -55,8 +55,11 @@ public:
 	void func_def(const String& name);
 	void func_def_end();
 
-	void func_def_param(const String& name, const String& type);
-	void func_def_param_end(const char* rettype);
+	void func_def_param(const char* name, const char* type);
+	void func_def_param_end();
+
+	void func_def_ret(const char* type);
+	void func_def_ret_end();
 
 	FuncTermImpl* root;
 	ContextSPtr   ctx;

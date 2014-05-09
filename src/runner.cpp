@@ -56,16 +56,19 @@ int Context::suits(Seq proto_types, Seq input_types) {
 	int suits_score = 0;
 	auto j = begin(input_types);
 	for (auto& i: proto_types) {
-		auto proto = i->term()->type();
 		auto input = (*j)->term()->type();
 		if (input == TermType::FUNC) {
 			auto func = (*j)->term().impl<FuncTermImpl>();
 			input = func->ret()->term()->type();
 		}
-		if (proto == input)
-			++suits_score;
-		else if (proto != TermType::ABSTRACT)
-			return 0;
+		if (i->term()) {
+			if (i->term()->type() == input)
+				suits_score += 2;
+			else
+				return 0;
+		}
+		else
+			suits_score += 1;
 		++j;
 	}
 	return suits_score;

@@ -44,7 +44,10 @@ void ParseStates::clear_flow() {
 	states_.back().flow->flow().clear();
 }
 
-ParseContext::ParseContext() {}
+void ParseContext::show_report(const char* s) {
+	String format = s;
+	jt::Rep.report(jt::Report(jt::ReportLevel::USER_ERR, __FILE__, __LINE__, format.c_str())); 
+}
 
 void ParseContext::put_var(int number) {
 	states_->push_var(number);
@@ -131,18 +134,33 @@ Seq seq_from_flow(Flow flow) {
 	return ret;
 }
 
-void ParseContext::func_def_param(const String& name, const String& type) {
+void ParseContext::func_def_param(const char* name, const char* type) {
 	Var v;
 	v->set_name(name);
-	v->set_term(l_make_term(type.c_str()));
+	if (type[0] != 0)
+		v->set_term(l_make_term(type));
 	states_->push(v);
 }
 
-void ParseContext::func_def_param_end(const char* rettype) {
+void ParseContext::func_def_param_end() {
 	auto moved = seq_from_flow(states_->flow);
 	states_.pop();
 	states_->func->set_args(moved);
-	states_->func->set_ret(make_var(l_make_term(rettype)));
+	states_.push();
+}
+
+void ParseContext::func_def_ret(const char* type) {
+	Var v;
+	v->set_term(l_make_term(type));
+	states_->push(v);
+}
+
+void ParseContext::func_def_ret_end() {
+	auto moved = seq_from_flow(states_->flow);
+	states_.pop();
+	JT_COMP_ASSERT(moved->vars().size() <= 1, "More than one return type isn't supported yet");
+	if (!moved->vars().empty())
+		states_->func->set_ret(moved->vars().front());
 	states_.push();
 }
 
