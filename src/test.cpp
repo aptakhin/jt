@@ -24,6 +24,13 @@ Var jt_print(CallUnit* unit, IntTermImpl* number) {
 	return make_var_none();
 }
 
+Var jt_printb(CallUnit* unit, BoolTermImpl* b) {
+	std::ostringstream* out = (std::ostringstream*)
+		unit->get_var("stream").impl<IntTermImpl>()->number();
+	(*out) << b->boolean();
+	return make_var_none();
+}
+
 Var jt_plus(CallUnit*, IntTermImpl* a, IntTermImpl* b) {
 	return make_ivar(a->number() + b->number());
 }
@@ -32,8 +39,12 @@ Var jt_mul(CallUnit*, IntTermImpl* a, IntTermImpl* b) {
 	return make_ivar(a->number() * b->number());
 }
 
-Var jt_get(CallUnit* unit, StringTermImpl* iname) {
-	return make_var(unit->get_var(iname->str()));
+Var jt_eq(CallUnit*, IntTermImpl* a, IntTermImpl* b) {
+	return make_bvar(a->number() == b->number());
+}
+
+Var jt_get(CallUnit* unit, StringTermImpl* varname) {
+	return make_var(unit->get_var(varname->str()));
 }
 
 template <typename Ret, typename A1>
@@ -90,6 +101,7 @@ protected:
 		run_    = std::make_unique<CallUnit>(nullptr, *root_.get(), ctx_);
 		parser_ = std::make_unique<Parser>(root_.get(), ctx_);
 		setup_std(ctx_);
+		out_ << std::boolalpha;
 	}
 
 	void setup_std(ContextSPtr ctx) {
@@ -97,10 +109,12 @@ protected:
 		Var v = make_ivar((int) &out_);
 		v->set_name("stream");
 		print_init_args->add(v);
-		ctx->add_named("print",   def_func<IntTermImpl>(jt_print, "to_print", print_init_args));
-		ctx->add_named("op_plus", def_func<IntTermImpl>(jt_plus,  "a", "b"));
-		ctx->add_named("op_mul",  def_func<IntTermImpl>(jt_mul,   "a", "b"));
-		ctx->add_named("op_get",  def_func<IntTermImpl>(jt_get,   "unit"));
+		ctx->add_named("print",   def_func<IntTermImpl>(jt_print,  "to_print", print_init_args));
+		ctx->add_named("print",   def_func<IntTermImpl>(jt_printb, "to_print", print_init_args));
+		ctx->add_named("op_get",  def_func<IntTermImpl>(jt_get,    "var"));
+		ctx->add_named("op_plus", def_func<IntTermImpl>(jt_plus,   "a", "b"));
+		ctx->add_named("op_mul",  def_func<IntTermImpl>(jt_mul,    "a", "b"));
+		ctx->add_named("op_eq",   def_func<BoolTermImpl>(jt_eq,    "a", "b"));
 	}
 
 #define TEST_OUT(t_out) { exec(); ASSERT_EQ(t_out, out_.str()); }
@@ -115,9 +129,6 @@ protected:
 		fout << parser_->str() << std::endl << std::endl;
 
 		inf.local(run_->flow());
-
-		//AstChecker check;
-		//check.visit("", root_->flow());
 
 		AstPrinter print(fout);
 		print.visit("", root_->flow());
@@ -162,6 +173,33 @@ TEST_F(BaseTest, SimpleVar) {
 	run_->set_flow(Flow(listed({print_call})));
 	TEST_OUT("5");
 }
+
+TEST_F(BaseTest, SimpleEq) {
+	auto cond = FuncCall("op_eq", make_ivar(2), make_ivar(2));
+	Var pvar;
+	pvar->set_value(cond);
+	auto print_call = FuncCall("print", pvar);
+	run_->set_flow(Flow(listed({print_call})));
+	TEST_OUT("true");
+}
+
+TEST_F(BaseTest, SimpleEqNot) {
+	auto cond = FuncCall("op_eq", make_ivar(2), make_ivar(3));
+	Var pvar;
+	pvar->set_value(cond);
+	auto print_call = FuncCall("print", pvar);
+	run_->set_flow(Flow(listed({print_call})));
+	TEST_OUT("false");
+}
+
+//TEST_F(BaseTest, SimpleIf) {
+//	auto cond = FuncCall("op_neq", make_ivar(2), make_ivar(3));
+//	auto iff  = If();
+//	iff->set_cond(cond);
+//	auto print_call = FuncCall("print", pvar);
+//	run_->set_flow(Flow(listed({print_call})));
+//	TEST_OUT("5");
+//}
 
 TEST(Common, Lexer) {
 	char w[] = "def func()\n { x = 5; }";

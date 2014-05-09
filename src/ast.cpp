@@ -128,6 +128,12 @@ Var make_ivar(int i) {
 	return v;
 }
 
+Var make_bvar(bool b) {
+	Var v;
+	v->set_term(make_term<BoolTermImpl>(b));
+	return v;
+}
+
 Var make_svar(const String& str) {
 	Var v;
 	v->set_term(make_term<StringTermImpl>(str));

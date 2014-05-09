@@ -112,7 +112,8 @@ enum class NodeType {
 	VAR,
 	FUNC,
 	FUNC_CALL,
-	NATIVE_FUNC_CALL
+	NATIVE_FUNC_CALL,
+	IF,
 };
 
 class Term;
@@ -123,6 +124,7 @@ public:
 		UNKNOWN,
 		ABSTRACT,
 		INT4,
+		BOOL,
 		STRING,
 		FUNC,
 	};
@@ -177,6 +179,18 @@ public:
 
 private:
 	int number_;
+};
+
+class BoolTermImpl : public TermImpl {
+public:
+	static const TermType::Type TYPE = TermType::BOOL;
+
+	BoolTermImpl(bool b = false) : TermImpl(this), b_(b) {}
+
+	bool boolean() const { return b_; }
+
+private:
+	int b_;
 };
 
 class StringTermImpl : public TermImpl {
@@ -319,6 +333,7 @@ private:
 };
 
 Var make_ivar(int i);
+Var make_bvar(bool b);
 Var make_svar(const String& str);
 
 template <typename TermImpl>
@@ -532,6 +547,29 @@ private:
 	Var ret_;
 
 	Seq init_args_;
+};
+
+JT_AST_NODE(If) {
+public:
+	static const NodeType TYPE = NodeType::IF;
+
+	IfImpl() 
+	:	NodeImpl(this),
+		cond_(nullptr), then_(nullptr), other_(nullptr) {}
+
+	Node cond() const { return cond_; }
+	void set_cond(Node cond) { cond_ = cond; }
+
+	Node then() const { return then_; }
+	void set_then(Node then) { then_ = then; }
+
+	Node other() const { return other_; }
+	void set_other(Node other) { other_ = other; }
+
+protected:
+	Node cond_;
+	Node then_;
+	Node other_;
 };
 
 class AstPrinter : public IVisitor {
