@@ -201,20 +201,33 @@ TEST_F(BaseTest, SimpleEqNot) {
 }
 
 TEST_F(BaseTest, SimplePrintStr) {
-	auto print_call = FuncCall("print", make_svar("Test_str"));
+	auto print_call = FuncCall("print", make_svar("Test str"));
 	run_->set_flow(Flow(listed({print_call})));
-	TEST_OUT("Test_str");
+	TEST_OUT("Test str");
 }
 
-//TEST_F(BaseTest, SimpleIf) {
-//	auto cond = FuncCall("op_eq", make_ivar(2), make_ivar(3));
-//	auto iff  = If();
-//	iff->set_cond(cond);
-//	iff->set_then(FuncCall("print",  make_svar("equal")));
-//	iff->set_other(FuncCall("print", make_svar("not_equal")));
-//	run_->set_flow(Flow(listed({iff})));
-//	TEST_OUT("not_equal");
-//}
+TEST_F(BaseTest, SimpleIf) {
+	auto cond = FuncCall("op_eq", make_ivar(2), make_ivar(3));
+	auto iff  = If();
+	iff->set_cond(cond);
+	iff->set_then(FuncCall("print",  make_svar("Equal")));
+	iff->set_other(FuncCall("print", make_svar("Not equal")));
+	run_->set_flow(Flow(listed({iff})));
+	TEST_OUT("Not equal");
+}
+
+TEST_F(BaseTest, SimpleIf2) {
+	auto cond = FuncCall("op_eq", make_ivar(2), make_ivar(2));
+	auto iff  = If();
+	iff->set_cond(cond);
+	iff->set_then(Flow(listed({
+		FuncCall("print", make_svar("Equal")), 
+		FuncCall("print", make_svar(" and smth else"))
+	})));
+	iff->set_other(FuncCall("print", make_svar("Not equal")));
+	run_->set_flow(Flow(listed({iff})));
+	TEST_OUT("Equal and smth else");
+}
 
 TEST(Common, Lexer) {
 	char w[] = "def func()\n { x = 5; }";

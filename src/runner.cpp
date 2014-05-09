@@ -112,8 +112,7 @@ void CallUnit::set_flow(Flow flow) {
 
 Term CallUnit::exec() {
 	Term latest;
-	for (auto& i: flow())
-		latest = exec_node(i);
+	latest = exec_node(flow());
 	return latest;
 }
 
@@ -181,6 +180,15 @@ Term CallUnit::exec_node(Node node) {
 			tm = *found;
 	}
 	switch (node->type()) {
+	case NodeType::FLOW: {
+		auto flow = node.impl<FlowImpl>();
+		Term latest;
+		for (auto& i: flow->flow())
+			latest = exec_node(i);
+		tm = latest;
+	}
+		break;
+
 	case NodeType::FUNC_CALL: {
 		auto call = node.impl<FuncCallImpl>();
 		auto impl = tm.impl<FuncTermImpl>();
@@ -208,6 +216,25 @@ Term CallUnit::exec_node(Node node) {
 		auto calc = resolve(node);
 		tm = calc->term();
 		stack_.back()->add_named(n->name(), tm);
+		return tm;
+	}
+		break;
+
+	case NodeType::IF: {
+		auto iff = node.impl<IfImpl>();
+		stack_.push_back(std::make_shared<Context>(stack_.back()));
+		auto cond = resolve(iff->cond());
+		tm = cond->term();
+		JT_COMP_ASSERT(tm->type() == TermType::BOOL, 
+			"Inferencer error. Condition at if isn't boolean");
+		if (auto condb = tm.if_is<BoolTermImpl>()) {
+			Node next_exec = condb->boolean()? iff->then() : next_exec = iff->other();
+			if (next_exec) {
+				// context stack push!
+				exec_node(next_exec);
+			}	
+		}
+		stack_.pop_back();
 		return tm;
 	}
 		break;
