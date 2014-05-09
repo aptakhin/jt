@@ -93,15 +93,15 @@ private:
 class  JT_CAT(Name, Impl);\
 class Name : public AstNodeGuard< JT_CAT(Name, Impl) >\
 {\
-public:\
-template <typename... Args>\
-Name(Args... args) : AstNodeGuard(new JT_CAT(Name, Impl)(args...)) {}\
-\
-Name(JT_CAT(Name, Impl)* impl) : AstNodeGuard(impl) {}\
-Name(Name&& mv) : AstNodeGuard(mv.impl()) {}\
-/*Name(const Name& cpy) : AstNodeGuard(const_cast<JT_CAT(Name, Impl)*>(cpy.impl())) {}*/\
-/*template <>\
-Name(const std::initializer_list<Node>& init) : AstNodeGuard(new JT_CAT(Name, Impl)(init)) {}*/\
+	public:\
+	template <typename... Args>\
+	Name(Args... args) : AstNodeGuard(new JT_CAT(Name, Impl)(args...)) {}\
+	\
+	Name(JT_CAT(Name, Impl)* impl) : AstNodeGuard(impl) {}\
+	Name(Name&& mv) : AstNodeGuard(mv.impl()) {}\
+	/*Name(const Name& cpy) : AstNodeGuard(const_cast<JT_CAT(Name, Impl)*>(cpy.impl())) {}*/\
+	/*template <>\
+	Name(const std::initializer_list<Node>& init) : AstNodeGuard(new JT_CAT(Name, Impl)(init)) {}*/\
 };\
 class JT_CAT(Name, Impl) : public NodeImpl
 
@@ -385,7 +385,7 @@ public:
 
 	void add(Var var) { seq_.push_back(var); }
 
-	Var operator [] (const String& name) const;
+	Var find(const String& name) const;
 
 	virtual void do_visit(IVisitor* visitor) const override;
 
@@ -453,53 +453,47 @@ protected:
 typedef Var(*JtNative) (Seq);
 
 template <typename A1>
-Var func_map_seq(void* func, CallUnit* unit, Seq args) {
+Var func_map_seq(void* func, CallUnit* unit, FuncTermImpl* parent, Seq args) {
 	assert(args->vars().size() == 1);
-	typedef Var(*NativeFunc) (CallUnit*, A1*);
+	typedef Var(*NativeFunc) (CallUnit*, FuncTermImpl*, A1*);
 	NativeFunc native_func = (NativeFunc) func;
 	auto a0 = args->vars()[0]->term().impl<A1>();
-	return native_func(unit, a0);
+	return native_func(unit, parent, a0);
 }
 
 template <typename A1, typename A2>
-Var func_map_seq(void* func, CallUnit* unit, Seq args) {
+Var func_map_seq(void* func, CallUnit* unit, FuncTermImpl* parent, Seq args) {
 	assert(args->vars().size() == 2);
-	typedef Var(*NativeFunc) (CallUnit*, A1*, A2*);
+	typedef Var(*NativeFunc) (CallUnit*, FuncTermImpl*, A1*, A2*);
 	NativeFunc native_func = (NativeFunc) func;
 	auto a0 = args->vars()[0]->term().impl<A1>();
 	auto a1 = args->vars()[1]->term().impl<A2>();
-	return native_func(unit, a0, a1);
+	return native_func(unit, parent, a0, a1);
 }
 
 class NativeCall {
 public:
-	typedef Var(*NativeMapper) (void* func, CallUnit* unit, Seq args);
-	typedef void(*Store)(...);
+	typedef Var (*NativeMapper) (void* func, CallUnit* unit, FuncTermImpl* parent, Seq args);
+	typedef void (*Store)(...);
 
 	NativeCall()
 	:	call_(nullptr), native_func_(nullptr) {}
 
 	template <typename A1>
-	NativeCall(Var(*native_func)(CallUnit* unit, A1*))
+	NativeCall(Var (*native_func)(CallUnit*, FuncTermImpl*, A1*))
 	:	call_(&func_map_seq<A1>), native_func_((Store) native_func) {}
 
 	template <typename A1, typename A2>
-	NativeCall(Var(*native_func)(CallUnit* unit, A1*, A2*))
+	NativeCall(Var (*native_func)(CallUnit*, FuncTermImpl*, A1*, A2*))
 	:	call_(&func_map_seq<A1, A2>), native_func_((Store) native_func) {}
 
-	template <typename A1, typename A2>
-	void set(Var(*native_func)(A1*, A2*)) {
-		call = &func_map_seq<A1, A2>;
-		native_func_ = (void*) native_func;
-	}
-
-	Var call(CallUnit* unit, Seq args) {
-		return call_(native_func_, unit, args);
+	Var call(CallUnit* unit, FuncTermImpl* parent_func, Seq args) {
+		return call_(native_func_, unit, parent_func, args);
 	}
 
 private:
 	NativeMapper call_;
-	void(*native_func_)(...);
+	void (*native_func_)(...);
 	std::vector<String> names_;
 };
 
@@ -516,7 +510,7 @@ public:
 	Seq args() { return args_; }
 	void set_args(Seq args) { args_ = args; }
 
-	Var do_call(CallUnit* unit, Seq args);
+	Var do_call(CallUnit* unit, FuncTermImpl* parent, Seq args);
 
 	virtual void do_visit(IVisitor* visitor) const override;
 

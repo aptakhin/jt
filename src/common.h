@@ -183,5 +183,6 @@ bool starts_with(const String& str, const char* is_prefix);
 bool starts_with(const String& str, const String& is_prefix);
 
 class ParserContext;
+class FuncTermImpl;
 
 } // namespace jt {

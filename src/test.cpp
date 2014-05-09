@@ -9,6 +9,11 @@
 
 using namespace jt;
 
+template <typename T>
+T& ref_cast(Term t) {
+	return *((T*) t.impl<IntTermImpl>()->number());
+}
+
 std::vector<Node> listed(std::initializer_list<Node>&& init) {
 	return std::move(std::vector<Node>(init));
 }
@@ -17,45 +22,42 @@ Var make_var_none() {
 	return Var();
 }
 
-Var jt_print(CallUnit* unit, IntTermImpl* number) {
-	std::ostringstream* out = (std::ostringstream*)
-		unit->get_var("stream").impl<IntTermImpl>()->number();
-	(*out) << number->number();
+Var jt_print(CallUnit*, FuncTermImpl* root, IntTermImpl* number) {
+	auto& out = ref_cast<std::ostringstream>(root->init_args()->find("stream")->term());
+	out << number->number();
 	return make_var_none();
 }
 
-Var jt_printb(CallUnit* unit, BoolTermImpl* b) {
-	std::ostringstream* out = (std::ostringstream*)
-		unit->get_var("stream").impl<IntTermImpl>()->number();
-	(*out) << b->boolean();
+Var jt_printb(CallUnit*, FuncTermImpl* root, BoolTermImpl* b) {
+	auto& out = ref_cast<std::ostringstream>(root->init_args()->find("stream")->term());
+	out << b->boolean();
 	return make_var_none();
 }
 
-Var jt_prints(CallUnit* unit, StringTermImpl* s) {
-	std::ostringstream* out = (std::ostringstream*)
-		unit->get_var("stream").impl<IntTermImpl>()->number();
-	(*out) << s->str();
+Var jt_prints(CallUnit*, FuncTermImpl* root, StringTermImpl* s) {
+	auto& out = ref_cast<std::ostringstream>(root->init_args()->find("stream")->term());
+	out << s->str();
 	return make_var_none();
 }
 
-Var jt_plus(CallUnit*, IntTermImpl* a, IntTermImpl* b) {
+Var jt_plus(CallUnit*, FuncTermImpl*, IntTermImpl* a, IntTermImpl* b) {
 	return make_ivar(a->number() + b->number());
 }
 
-Var jt_mul(CallUnit*, IntTermImpl* a, IntTermImpl* b) {
+Var jt_mul(CallUnit*, FuncTermImpl*, IntTermImpl* a, IntTermImpl* b) {
 	return make_ivar(a->number() * b->number());
 }
 
-Var jt_eq(CallUnit*, IntTermImpl* a, IntTermImpl* b) {
+Var jt_eq(CallUnit*, FuncTermImpl*, IntTermImpl* a, IntTermImpl* b) {
 	return make_bvar(a->number() == b->number());
 }
 
-Var jt_get(CallUnit* unit, StringTermImpl* varname) {
+Var jt_get(CallUnit* unit, FuncTermImpl*, StringTermImpl* varname) {
 	return make_var(unit->get_var(varname->str()));
 }
 
 template <typename Ret, typename A1>
-Term def_func(Var(*func)(CallUnit*, A1*), const String& a1name, Seq init_args = Seq()) {
+Term def_func(Var(*func)(CallUnit*, FuncTermImpl*, A1*), const String& a1name, Seq init_args = Seq()) {
 	auto func_impl = new FuncTermImpl;
 	{ // Filling arguments for function
 		Seq seq;
@@ -77,7 +79,7 @@ Term def_func(Var(*func)(CallUnit*, A1*), const String& a1name, Seq init_args = 
 }
 
 template <typename Ret, typename A1, typename A2>
-Term def_func(Var(*func)(CallUnit*, A1*, A2*), const String& a1name, const String& a2name, Seq init_args = Seq()) {
+Term def_func(Var(*func)(CallUnit*, FuncTermImpl*, A1*, A2*), const String& a1name, const String& a2name, Seq init_args = Seq()) {
 	auto func_impl = new FuncTermImpl;
 	{ // Filling arguments for function
 		Seq seq;

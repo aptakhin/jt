@@ -94,7 +94,7 @@ SeqImpl::SeqImpl(const std::vector<Var>& vars)
 :	NodeImpl(this),
 	seq_(vars) {}
 
-Var SeqImpl::operator [] (const String& name) const
+Var SeqImpl::find(const String& name) const
 {
 	for (auto& i: seq_) {
 		if (i->name() == name)
@@ -155,8 +155,8 @@ Var make_var(Term term) {
 	return v;
 }
 
-Var NativeFuncCallImpl::do_call(CallUnit* unit, Seq args) {
-	return native_.call(unit, args);
+Var NativeFuncCallImpl::do_call(CallUnit* unit, FuncTermImpl* parent, Seq args) {
+	return native_.call(unit, parent, args);
 }
 
 void NativeFuncCallImpl::do_visit(IVisitor* vis) const {
