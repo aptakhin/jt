@@ -21,7 +21,6 @@ void Parser::push(const String& c) {
 
 	Lexer lexer(c.c_str(), c.c_str() + c.size());
 	int status;
-
 	int lexx;
 
 	do {
@@ -33,7 +32,7 @@ void Parser::push(const String& c) {
 
 		if (tok.lex == UNKNOWN)
 			break;
-		if (tok.lex == SPACE)
+		if (tok.lex == SPACE || tok.lex == NEW_LINE)
 			continue; // TODO: More parser checks 
 		lexx = tok.lex;
 		if (lexx == NUMBER)

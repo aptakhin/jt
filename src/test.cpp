@@ -411,7 +411,7 @@ public:
 			switch (state)
 			{
 			case SOURCE:
-				parser_->push(line);
+				parser_->push(line + "\n");
 				break;
 
 			case OUTPUT:
