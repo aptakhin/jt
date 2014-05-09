@@ -74,7 +74,8 @@ void ParseContext::put_func_call_all(const String& name, size_t args) {
 	// This all is hacking, because thinking in push/pop became too difficult
 	// Cut last _args_ nodes and push them to new call.
 	auto i = states_->flow->flow().begin();
-	assert(states_->flow->flow().size() >= args);
+	JT_COMP_ASSERT(states_->flow->flow().size() >= args, 
+		"Can't cut such quantity of nodes from flow");
 	std::advance(i, states_->flow->flow().size() - args);
 	auto erase_from = i;
 	for (size_t j = 0; j < args; ++i, ++j)
@@ -87,21 +88,10 @@ void ParseContext::put_func_call_all(const String& name, size_t args) {
 	states_->flow->add(func_call);
 }
 
-Node ParseContext::find_var(const String& name) {
-	for (auto& i: root->flow()) {
-		if (auto def = i.if_is<VarImpl>()) {
-			if (def->name() == name)
-				return def;
-		}
-	}
-	// Error report
-	return 0;
-}
-
 void ParseContext::func_def(const String& name) {
 	states_.push();
 	states_->func = new FuncTermImpl;
-	states_->var = new VarImpl;
+	states_->var  = new VarImpl;
 	states_->var->set_term(make_term_move_ptr(states_->func));
 	states_->var->set_name(name);
 	states_.push();

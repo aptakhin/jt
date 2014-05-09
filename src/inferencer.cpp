@@ -76,9 +76,9 @@ Term Inferencer::local(Node node) {
 
 	case NodeType::IF: {
 		auto iff = node.impl<IfImpl>();
-		auto cond_term = local(iff->cond());
+		auto cond_term  = local(iff->cond());
 		iff->cond()->set_term(cond_term);
-		auto then_term = local(iff->then());
+		auto then_term  = local(iff->then());
 		iff->then()->set_term(then_term);
 		auto other_term = local(iff->other());
 		iff->other()->set_term(other_term);

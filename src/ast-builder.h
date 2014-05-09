@@ -61,8 +61,6 @@ public:
 	FuncTermImpl* root;
 	ContextSPtr   ctx;
 
-	Node find_var(const String& name);
-
 	void finish();
 
 protected:

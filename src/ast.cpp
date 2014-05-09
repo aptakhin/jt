@@ -94,6 +94,15 @@ SeqImpl::SeqImpl(const std::vector<Var>& vars)
 :	NodeImpl(this),
 	seq_(vars) {}
 
+Var SeqImpl::operator [] (const String& name) const
+{
+	for (auto& i: seq_) {
+		if (i->name() == name)
+			return i;
+	}
+	return Var();
+}
+
 void SeqImpl::do_visit(IVisitor* vis) const {
 	vis->caption("Seq");
 	for (auto& i: seq_)

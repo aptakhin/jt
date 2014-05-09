@@ -385,6 +385,8 @@ public:
 
 	void add(Var var) { seq_.push_back(var); }
 
+	Var operator [] (const String& name) const;
+
 	virtual void do_visit(IVisitor* visitor) const override;
 
 protected:
