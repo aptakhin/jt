@@ -21,7 +21,6 @@ void Parser::push(const String& c) {
 
 	Lexer lexer(c.c_str(), c.c_str() + c.size());
 	int status;
-	int lexx;
 
 	do {
 		YYSTYPE yylval;
@@ -34,7 +33,7 @@ void Parser::push(const String& c) {
 			break;
 		if (tok.lex == SPACE || tok.lex == NEW_LINE)
 			continue; // TODO: More parser checks 
-		lexx = tok.lex;
+		int lexx = tok.lex;
 		if (lexx == NUMBER)
 			yylval.i = tok.i;
 		if (!tok.ident.empty())

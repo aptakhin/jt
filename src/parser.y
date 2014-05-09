@@ -135,11 +135,11 @@ AtomExpr:
 
 SubExpr:
 	AtomExpr {}
-	| SubExpr PLUS AtomExpr {
+	| SubExpr PLUS SubExpr {
 		printf("SubExpr + AtomExpr\n");
 		ctx->put_func_call_all("op_plus", 2);
 	}
-	| SubExpr MUL AtomExpr {
+	| SubExpr MUL SubExpr {
 		printf("SubExpr * AtomExpr\n");
 		ctx->put_func_call_all("op_mul", 2);
 	}

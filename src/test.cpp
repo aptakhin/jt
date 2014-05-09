@@ -281,12 +281,11 @@ TEST_F(BaseTest, Parser41Plus1Circ2) {
 	TEST_OUT("42");
 }
 
-//// Precedence doesn't work
-//TEST_F(BaseTest, ParserMul) {
-//	parser_->push("x = 1 + 2 * 3;");
-//	call_print("x");
-//	TEST_OUT("7");
-//}
+TEST_F(BaseTest, ParserMul) {
+	parser_->push("x = 1 + 2 * 3;");
+	call_print("x");
+	TEST_OUT("7");
+}
 
 TEST_F(BaseTest, ParserMul2) {
 	parser_->push("x = 1 * 2 + 3;");
