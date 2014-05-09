@@ -154,6 +154,10 @@ void NativeFuncCallImpl::do_visit(IVisitor* vis) const {
 	vis->caption("NativeFuncCall");
 }
 
+void IfImpl::do_visit(IVisitor* visitor) const {
+
+}
+
 AstPrinter::AstPrinter(std::ostream& out)
 :	out_(out),
 	offset_(0) {}

@@ -566,6 +566,8 @@ public:
 	Node other() const { return other_; }
 	void set_other(Node other) { other_ = other; }
 
+	virtual void do_visit(IVisitor* visitor) const override;
+
 protected:
 	Node cond_;
 	Node then_;

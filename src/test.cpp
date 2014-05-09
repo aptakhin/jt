@@ -31,6 +31,13 @@ Var jt_printb(CallUnit* unit, BoolTermImpl* b) {
 	return make_var_none();
 }
 
+Var jt_prints(CallUnit* unit, StringTermImpl* s) {
+	std::ostringstream* out = (std::ostringstream*)
+		unit->get_var("stream").impl<IntTermImpl>()->number();
+	(*out) << s->str();
+	return make_var_none();
+}
+
 Var jt_plus(CallUnit*, IntTermImpl* a, IntTermImpl* b) {
 	return make_ivar(a->number() + b->number());
 }
@@ -111,6 +118,7 @@ protected:
 		print_init_args->add(v);
 		ctx->add_named("print",   def_func<IntTermImpl>(jt_print,  "to_print", print_init_args));
 		ctx->add_named("print",   def_func<IntTermImpl>(jt_printb, "to_print", print_init_args));
+		ctx->add_named("print",   def_func<IntTermImpl>(jt_prints, "to_print", print_init_args));
 		ctx->add_named("op_get",  def_func<IntTermImpl>(jt_get,    "var"));
 		ctx->add_named("op_plus", def_func<IntTermImpl>(jt_plus,   "a", "b"));
 		ctx->add_named("op_mul",  def_func<IntTermImpl>(jt_mul,    "a", "b"));
@@ -192,13 +200,20 @@ TEST_F(BaseTest, SimpleEqNot) {
 	TEST_OUT("false");
 }
 
+TEST_F(BaseTest, SimplePrintStr) {
+	auto print_call = FuncCall("print", make_svar("Test_str"));
+	run_->set_flow(Flow(listed({print_call})));
+	TEST_OUT("Test_str");
+}
+
 //TEST_F(BaseTest, SimpleIf) {
-//	auto cond = FuncCall("op_neq", make_ivar(2), make_ivar(3));
+//	auto cond = FuncCall("op_eq", make_ivar(2), make_ivar(3));
 //	auto iff  = If();
 //	iff->set_cond(cond);
-//	auto print_call = FuncCall("print", pvar);
-//	run_->set_flow(Flow(listed({print_call})));
-//	TEST_OUT("5");
+//	iff->set_then(FuncCall("print",  make_svar("equal")));
+//	iff->set_other(FuncCall("print", make_svar("not_equal")));
+//	run_->set_flow(Flow(listed({iff})));
+//	TEST_OUT("not_equal");
 //}
 
 TEST(Common, Lexer) {
