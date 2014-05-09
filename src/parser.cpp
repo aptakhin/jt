@@ -1,13 +1,16 @@
 #include "parser.h"
-#include "parser_gen.hpp"
-#include <list>
+#include "ast-builder.h"
 
 namespace jt {
 
 Parser::Parser(FuncTermImpl* root, ContextSPtr ctx)
 :	root_(root),
 	ctx_(ctx),
-	pstate_(yypstate_new()) {}
+	pstate_(yypstate_new()) {
+	parse_ = std::make_unique<ParseContext>();
+	parse_->root = root_;
+	parse_->ctx  = ctx_;
+}
 
 Parser::~Parser() {
 	yypstate_delete(pstate_);
@@ -19,16 +22,13 @@ void Parser::push(const String& c) {
 	Lexer lexer(c.c_str(), c.c_str() + c.size());
 	int status;
 
-	ParseContext parse;
-	parse.root = root_;
-	parse.ctx = ctx_;
 	int lexx;
-	std::list<Token> tokens;
+
 	do {
 		YYSTYPE yylval;
 		memset(&yylval, 0, sizeof(yylval));
-		tokens.push_back(Token());
-		Token& tok = tokens.back();
+		tokens_.push_back(Token());
+		Token& tok = tokens_.back();
 		lexer.next_lexeme(&tok);
 
 		if (tok.lex == UNKNOWN)
@@ -40,9 +40,9 @@ void Parser::push(const String& c) {
 			yylval.i = tok.i;
 		if (!tok.ident.empty())
 			yylval.str = (char*) tok.ident.c_str();
-		status = yypush_parse(pstate_, lexx, &yylval, &parse);
+		status = yypush_parse(pstate_, lexx, &yylval, parse_.get());
 	} while (status == YYPUSH_MORE);
-	parse.finish();
+	parse_->finish();
 }
 
 } // namespace jt {

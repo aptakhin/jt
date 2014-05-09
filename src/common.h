@@ -179,4 +179,9 @@ Optional<typename Container::mapped_type> iter2optional(typename Container::cons
 		return make_optional(iter->second);
 }
 
+bool starts_with(const String& str, const char* is_prefix);
+bool starts_with(const String& str, const String& is_prefix);
+
+class ParserContext;
+
 } // namespace jt {

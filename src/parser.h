@@ -3,10 +3,10 @@
 #pragma once
 
 #include "common.h"
-#include "ast-builder.h"
 #include "lexer.h"
 #include "runner.h"
 #include "parser_gen.hpp"
+#include <list>
 
 namespace jt {
 
@@ -24,7 +24,11 @@ protected:
 
 	yypstate* pstate_;
 
+	std::unique_ptr<ParseContext> parse_;
+
 	String str_;
+
+	std::list<Token> tokens_;
 };
 
 } // namespace jt {

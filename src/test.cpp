@@ -100,9 +100,9 @@ Term def_func(Var(*func)(CallUnit*, A1*, A2*), const String& a1name, const Strin
 	return make_term_move_ptr(func_impl);
 }
 
-class BaseTest : public ::testing::Test {
-protected:
-	void SetUp() override {
+class BaseEnv {
+public:
+	void setup_env() {
 		ctx_    = std::make_shared<Context>(nullptr);
 		root_   = std::make_unique<FuncTermImpl>();
 		run_    = std::make_unique<CallUnit>(nullptr, *root_.get(), ctx_);
@@ -123,6 +123,21 @@ protected:
 		ctx->add_named("op_plus", def_func<IntTermImpl>(jt_plus,   "a", "b"));
 		ctx->add_named("op_mul",  def_func<IntTermImpl>(jt_mul,    "a", "b"));
 		ctx->add_named("op_eq",   def_func<BoolTermImpl>(jt_eq,    "a", "b"));
+	}
+
+	ContextSPtr ctx_;
+	std::unique_ptr<FuncTermImpl> root_;
+
+	std::unique_ptr<CallUnit> run_;
+	std::unique_ptr<Parser>   parser_;
+
+	std::ostringstream out_;
+};
+
+class BaseTest : public ::testing::Test, public BaseEnv {
+protected:
+	void SetUp() override {
+		setup_env();
 	}
 
 #define TEST_OUT(t_out) { exec(); ASSERT_EQ(t_out, out_.str()); }
@@ -149,15 +164,6 @@ protected:
 		auto print = FuncCall("print", get);
 		run_->flow()->add(print);
 	}
-
-protected:
-	ContextSPtr ctx_;
-	std::unique_ptr<FuncTermImpl> root_;
-
-	std::unique_ptr<CallUnit> run_;
-	std::unique_ptr<Parser>   parser_;
-
-	std::ostringstream out_;
 };
 
 TEST_F(BaseTest, SimplePrint) {
@@ -356,6 +362,83 @@ TEST_F(BaseTest, DefFunc42) {
 	parser_->push("def func(a int) int { def plus2(b int) int { b + 2; } a + plus2(a); } x = func(20);");
 	call_print("x");
 	TEST_OUT("42");
+}
+
+class FileTest : private BaseEnv {
+public:
+	FileTest(const char* filename)
+	:	in_(filename) {
+		setup_env();
+	}
+
+	bool check(std::string& line, const char* to) {
+		bool res = starts_with(line, to);
+		if (!res)
+			return false;
+		size_t offset = strlen(to);
+		for (size_t i = offset; i < line.size(); ++i)
+		{
+			if (line[i] != '-')
+				JT_USER_ERR("Invalid characters");
+		}
+		return res;
+	}
+
+	void do_test() {
+		enum ReadState {
+			SOURCE,
+			OUTPUT,
+			ERR,
+		};
+		std::string out;
+		ReadState state = SOURCE, prev_state = state;
+		std::string line;
+		while (std::getline(in_, line)) {
+			if (check(line, "#")) // comment line
+				continue;
+			if (check(line, "test"))
+				state = SOURCE;
+			else if (check(line, "out"))
+				state = OUTPUT;
+			else if (check(line, "err"))
+				state = ERR;
+
+			if (state != prev_state) { // Ignore switch line
+				prev_state = state;
+				continue;
+			}
+
+			switch (state)
+			{
+			case SOURCE:
+				parser_->push(line);
+				break;
+
+			case OUTPUT:
+				if (!out.empty())
+					out += "\n";
+				out += line;
+				break;
+			}
+
+		}
+
+		TEST_OUT(out);
+	}
+
+	void exec() {
+		Inferencer inf(*root_.get(), ctx_);
+		inf.local(run_->flow());
+		run_->exec();
+	}
+
+protected:
+	std::ifstream in_;
+};
+
+TEST(FileTest, Test0) {
+	FileTest test("../../tests/test0.txt");
+	test.do_test();
 }
 
 int main(int argc, char** argv) {

@@ -184,6 +184,5 @@ int yyerror(jt::ParseContext* ctx, char* s)
 {
 	printf("yyerror: %s\n",s);
 	jt::Rep.report(jt::Report(jt::ReportLevel::USER_ERR, __FILE__, __LINE__, (s))); 
-	_CrtDbgBreak();
 	return 0;
 }
