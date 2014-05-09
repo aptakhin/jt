@@ -22,6 +22,8 @@ public:
 	Node(NodeImpl* impl) : base_impl_(impl) {}
 	virtual ~Node() {}
 
+	Node clone() const;
+
 	NodeImpl* base_impl() { return base_impl_; }
 
 	bool empty() const { return base_impl_ == nullptr; }
@@ -151,22 +153,12 @@ public:
 
 	virtual ~TermImpl() {}
 
+	virtual TermImpl* do_clone() const = 0;
+
 	TermType type() const { return type_; }
 
 protected:
 	TermType type_;
-};
-
-class AbstractTermImpl : public TermImpl {
-public:
-	static const TermType::Type TYPE = TermType::ABSTRACT;
-
-	AbstractTermImpl(const String& abstract_type) : TermImpl(this), abstract_type_(abstract_type) {}
-
-	const String& abstract_type() const { return abstract_type_; }
-
-private:
-	const String abstract_type_;
 };
 
 class IntTermImpl : public TermImpl {
@@ -174,6 +166,8 @@ public:
 	static const TermType::Type TYPE = TermType::INT4;
 
 	IntTermImpl(int number = 0) : TermImpl(this), number_(number) {}
+
+	virtual IntTermImpl* do_clone() const override { return new IntTermImpl(number_); }
 
 	int number() const { return number_; }
 
@@ -187,6 +181,8 @@ public:
 
 	BoolTermImpl(bool b = false) : TermImpl(this), b_(b) {}
 
+	virtual BoolTermImpl* do_clone() const override { return new BoolTermImpl(b_); }
+
 	bool boolean() const { return b_; }
 
 private:
@@ -198,6 +194,8 @@ public:
 	static const TermType::Type TYPE = TermType::STRING;
 
 	StringTermImpl(const String& str = "") : TermImpl(this), str_(str) {}
+
+	virtual StringTermImpl* do_clone() const override { return new StringTermImpl(str_); }
 
 	const String& str() const { return str_; }
 
@@ -213,7 +211,7 @@ public:
 
 	Term(std::shared_ptr<TermImpl> impl) : impl_(impl), type_(impl_->type()) {}
 
-	Term clone();
+	Term clone() const;
 
 	TermImpl* operator -> ();
 	const TermImpl* operator -> () const;
@@ -295,6 +293,8 @@ public:
 
 	virtual ~NodeImpl() {}
 
+	virtual NodeImpl* do_clone() const = 0;
+
 	Term term();
 	const Term term() const;
 	void set_term(Term term);
@@ -317,6 +317,8 @@ public:
 	static const NodeType TYPE = NodeType::VAR;
 
 	VarImpl() : NodeImpl(this) {}
+
+	virtual VarImpl* do_clone() const override;
 
 	void set_name(const String& name) { name_ = name; }
 	const String& name() const { return name_; }
@@ -354,6 +356,8 @@ public:
 	FlowImpl(FlowImpl&& flow);
 	FlowImpl(const std::vector<Node>& nodes);
 
+	virtual FlowImpl* do_clone() const override;
+
 	std::vector<Node>&       flow() { return flow_; }
 	const std::vector<Node>& flow() const { return flow_; }
 
@@ -377,6 +381,8 @@ public:
 
 	SeqImpl();
 	SeqImpl(const std::vector<Var>& vars);
+
+	virtual SeqImpl* do_clone() const override;
 
 	std::vector<Var>&       vars() { return seq_; }
 	const std::vector<Var>& vars() const { return seq_; }
@@ -433,14 +439,16 @@ public:
 	}
 
 	FuncCallImpl(const String& func_name, Node n1, Node n2)
-		: NodeImpl(this),
+	:	NodeImpl(this),
 		func_name_(func_name) {
 		flow_->add(n1);
 		flow_->add(n2);
 	}
 
+	virtual FuncCallImpl* do_clone() const override;
+
 	const String& name() const { return func_name_; }
-	Flow flow() { return flow_; }
+	Flow flow() const { return flow_; }
 	void set_flow(Flow flow) { flow_ = flow; }
 
 	virtual void do_visit(IVisitor* visitor) const override;
@@ -507,7 +515,9 @@ public:
 	:	NodeImpl(this),
 		native_(f) {}
 
-	Seq args() { return args_; }
+	virtual NativeFuncCallImpl* do_clone() const override;
+
+	Seq args() const { return args_; }
 	void set_args(Seq args) { args_ = args; }
 
 	Var do_call(CallUnit* unit, FuncTermImpl* parent, Seq args);
@@ -524,6 +534,8 @@ public:
 	static const TermType::Type TYPE = TermType::FUNC;
 
 	FuncTermImpl() : TermImpl(this) {}
+
+	virtual FuncTermImpl* do_clone() const override;
 
 	Seq args() const { return args_; }
 	void set_args(Seq a) { args_ = a; }
@@ -552,6 +564,8 @@ public:
 	IfImpl() 
 	:	NodeImpl(this),
 		cond_(nullptr), then_(nullptr), other_(nullptr) {}
+
+	virtual IfImpl* do_clone() const override;
 
 	Node cond() const { return cond_; }
 	void set_cond(Node cond) { cond_ = cond; }

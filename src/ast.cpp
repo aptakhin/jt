@@ -39,9 +39,14 @@ Term l_make_term(const char* type) {
 	return Term();
 }
 
+Node Node::clone() const {
+	return Node(base_impl_->do_clone());
+}
+
 std::vector<Node>::iterator begin(Flow& f) {
 	return f->flow().begin();
 }
+
 std::vector<Node>::iterator end(Flow& f) {
 	return f->flow().end();
 }
@@ -81,6 +86,21 @@ FlowImpl::FlowImpl(const std::vector<Node>& nodes)
 :	NodeImpl(this),
 	flow_(nodes) {}
 
+template <typename T, typename Container>
+Container clone_container(const Container& cont) {
+	Container res;
+	res.reserve(cont.size());
+	for (auto& i: cont)
+		res.push_back(T(i->do_clone()));
+	return std::move(res);
+}
+
+FlowImpl* FlowImpl::do_clone() const {
+	auto flow   = new FlowImpl;
+	flow->flow_ = clone_container<Node>(flow_);
+	return flow;
+}
+
 void FlowImpl::do_visit(IVisitor* vis) const {
 	vis->caption("Flow");
 	for (auto& i: flow_)
@@ -94,8 +114,13 @@ SeqImpl::SeqImpl(const std::vector<Var>& vars)
 :	NodeImpl(this),
 	seq_(vars) {}
 
-Var SeqImpl::find(const String& name) const
-{
+SeqImpl* SeqImpl::do_clone() const {
+	auto seq  = new SeqImpl;
+	seq->seq_ = clone_container<Var>(seq_);
+	return seq;
+}
+
+Var SeqImpl::find(const String& name) const {
 	for (auto& i: seq_) {
 		if (i->name() == name)
 			return i;
@@ -109,6 +134,14 @@ void SeqImpl::do_visit(IVisitor* vis) const {
 		vis->visit("", i);
 }
 
+VarImpl* VarImpl::do_clone() const {
+	auto var = new VarImpl();
+	var->set_name(name_);
+	var->set_value(value().clone());
+	var->set_term(term().clone());
+	return var;
+}
+
 void VarImpl::do_visit(IVisitor* vis) const {
 	vis->caption("Var ", name().c_str());
 	if (term())
@@ -117,10 +150,20 @@ void VarImpl::do_visit(IVisitor* vis) const {
 		vis->visit("Value", value());
 }
 
+FuncCallImpl* FuncCallImpl::do_clone() const {
+	auto call = new FuncCallImpl(func_name_);
+	call->set_flow(Flow(flow()->do_clone()));
+	return call;
+}
+
 void FuncCallImpl::do_visit(IVisitor* vis) const {
 	vis->caption("FuncCall ", name().c_str());
 	for (auto& i: flow_)
 		vis->visit("", i);
+}
+
+Term Term::clone() const {
+	return make_term_move_ptr(impl_->do_clone());
 }
 
 TermImpl* Term::operator -> () {
@@ -155,12 +198,35 @@ Var make_var(Term term) {
 	return v;
 }
 
+NativeFuncCallImpl* NativeFuncCallImpl::do_clone() const {
+	auto func = new NativeFuncCallImpl(native_);
+	func->set_args(Seq(args()->do_clone()));
+	return func;
+}
+
 Var NativeFuncCallImpl::do_call(CallUnit* unit, FuncTermImpl* parent, Seq args) {
 	return native_.call(unit, parent, args);
 }
 
 void NativeFuncCallImpl::do_visit(IVisitor* vis) const {
 	vis->caption("NativeFuncCall");
+}
+
+FuncTermImpl* FuncTermImpl::do_clone() const {
+	auto func = new FuncTermImpl;
+	func->set_args(Seq(args()->do_clone()));
+	func->set_flow(Flow(flow()->do_clone()));
+	func->set_init_args(Seq(init_args()->do_clone()));
+	func->set_ret(Var(ret()->do_clone()));
+	return func;
+}
+
+IfImpl* IfImpl::do_clone() const {
+	auto iff = new IfImpl;
+	iff->set_cond(cond().clone());
+	iff->set_then(then().clone());
+	iff->set_other(other().clone());
+	return iff;
 }
 
 void IfImpl::do_visit(IVisitor* visitor) const {
