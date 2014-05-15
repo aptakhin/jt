@@ -124,7 +124,6 @@ class TermType {
 public:
 	enum Type {
 		UNKNOWN,
-		ABSTRACT,
 		INT4,
 		BOOL,
 		STRING,
