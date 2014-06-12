@@ -145,7 +145,7 @@ class TermImpl {
 public:
 	template <typename Derived>
 	TermImpl(Derived* derived)
-		: type_(Derived::TYPE) {
+	:	type_(Derived::TYPE) {
 		JT_COMP_ASSERT((void*) derived == (TermImpl*) derived,
 			"Term derived type can't be sliced");
 	}

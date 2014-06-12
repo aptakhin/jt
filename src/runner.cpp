@@ -231,7 +231,7 @@ Term CallUnit::exec_node(Node node) {
 		JT_COMP_ASSERT(tm->type() == TermType::BOOL, 
 			"Inferencer error. Condition at if isn't boolean");
 		if (auto condb = tm.if_is<BoolTermImpl>()) {
-			Node next_exec = condb->boolean()? iff->then() : next_exec = iff->other();
+			Node next_exec = condb->boolean()? iff->then() : iff->other();
 			if (next_exec) {
 				// context stack push!
 				exec_node(next_exec);
