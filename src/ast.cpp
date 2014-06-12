@@ -273,7 +273,7 @@ void AstPrinter::visit_term(const char* title, const Term& term) {
 		print_offset();
 		out_ << "{ EMPTY }" << std::endl;
 	} else {
-		if (auto f = term.if_is<FuncTermImpl>()) {
+		if (auto f = term.as<FuncTermImpl>()) {
 			out_ << std::endl;
 			visit("Args", f->args());
 			out_ << std::endl;
@@ -281,9 +281,9 @@ void AstPrinter::visit_term(const char* title, const Term& term) {
 		} else {
 			print_offset();
 			out_ << title << (!title || title[0] == 0 ? "" : " ") << "{ ";
-			if (auto n = term.if_is<IntTermImpl>())
+			if (auto n = term.as<IntTermImpl>())
 				out_ << n->number();
-			else if (auto s = term.if_is<StringTermImpl>())
+			else if (auto s = term.as<StringTermImpl>())
 				out_ << s->str();
 			else
 				out_ << "Can't print";

@@ -32,7 +32,7 @@ Term Context::find_best(const String& name, Seq arg_types, int& best_score) {
 			best_score = 1;
 			return i->second;
 		}
-		if (auto is = i->second.if_is<FuncTermImpl>()) {
+		if (auto is = i->second.as<FuncTermImpl>()) {
 			auto score = suits(is->args(), arg_types);
 			if (score > best_score) {
 				best = i->second;
@@ -144,12 +144,11 @@ Term CallUnit::get_var(const String& name) {
 
 Var CallUnit::resolve(Node node) {
 	auto lookup = node;
-	if (auto v = node.if_is<VarImpl>()) {
+	if (auto v = node.as<VarImpl>()) {
 		if (v->term()) {
 			if (!v->value() || v->term()->type() != TermType::FUNC)
 				return Var(v);
 		}
-
 		lookup = v->value();
 	}
 
@@ -230,7 +229,7 @@ Term CallUnit::exec_node(Node node) {
 		tm = cond->term();
 		JT_COMP_ASSERT(tm->type() == TermType::BOOL, 
 			"Inferencer error. Condition at if isn't boolean");
-		if (auto condb = tm.if_is<BoolTermImpl>()) {
+		if (auto condb = tm.as<BoolTermImpl>()) {
 			Node next_exec = condb->boolean()? iff->then() : iff->other();
 			if (next_exec) {
 				// context stack push!

@@ -32,7 +32,7 @@ Term Inferencer::local(Node node) {
 				n->set_term(tm);
 		}
 
-		if (auto func = n->term().if_is<FuncTermImpl>()) {
+		if (auto func = n->term().as<FuncTermImpl>()) {
 			if (n->term().is_abstract()) {
 				// Setup input parameters, output
 				auto flow = func->flow();
@@ -61,7 +61,7 @@ Term Inferencer::local(Node node) {
 		}
 		auto found = stack_.back()->find_named(n->name(), args);
 
-		if (auto func = found.if_is<FuncTermImpl>()) {
+		if (auto func = found.as<FuncTermImpl>()) {
 			if (found.is_abstract()) {
 				// Setup input parameters, output
 				auto flow = func->flow();

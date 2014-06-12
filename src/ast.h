@@ -44,12 +44,12 @@ public:
 	}
 
 	template <typename Impl>
-	Impl* if_is() {
+	Impl* as() {
 		return is<Impl>() ? impl<Impl>() : nullptr;
 	}
 
 	template <typename Impl>
-	const Impl* if_is() const {
+	const Impl* as() const {
 		return is<Impl>() ? impl<Impl>() : nullptr;
 	}
 
@@ -221,12 +221,12 @@ public:
 	}
 
 	template <typename Impl>
-	Impl* if_is() {
+	Impl* as() {
 		return is<Impl>() ? impl<Impl>() : nullptr;
 	}
 
 	template <typename Impl>
-	const Impl* if_is() const {
+	const Impl* as() const {
 		return is<Impl>() ? impl<Impl>() : nullptr;
 	}
 
