@@ -57,6 +57,7 @@ typedef struct YYLTYPE
 %token PLUS
 %token MUL
 %token <str> IDENT
+%token <str> STR
 %token <i> NUMBER
 
 %left PLUS
@@ -127,10 +128,14 @@ FuncCall:
 AtomExpr:
 	IDENT {
 		printf("Ident %s\n", $1);
-		ctx->put_var($1);
+		ctx->put_ident($1);
 	}
 	| NUMBER {
 		printf("Number %d\n", $1);
+		ctx->put_var($1);
+	}
+	| STR {
+		printf("Str %s\n", $1);
 		ctx->put_var($1);
 	}
 	| FuncCall {}

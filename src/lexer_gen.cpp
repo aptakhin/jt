@@ -14,17 +14,19 @@ static const char _Lexer_actions[] = {
 	7, 1, 8, 1, 9, 1, 10, 1, 
 	11, 1, 12, 1, 13, 1, 14, 1, 
 	15, 1, 16, 1, 17, 1, 18, 1, 
-	19, 2, 2, 3, 2, 2, 4, 2, 
-	2, 5
+	19, 1, 20, 2, 2, 3, 2, 2, 
+	4, 2, 2, 5
 };
 
 static const char _Lexer_key_offsets[] = {
-	0, 0, 21, 23, 30, 37, 45, 53, 
-	61
+	0, 0, 7, 15, 37, 39, 46, 53, 
+	61, 69, 77
 };
 
 static const char _Lexer_trans_keys[] = {
-	9, 10, 32, 40, 41, 42, 43, 44, 
+	95, 48, 57, 65, 90, 97, 122, 34, 
+	95, 48, 57, 65, 90, 97, 122, 9, 
+	10, 32, 34, 40, 41, 42, 43, 44, 
 	59, 61, 95, 100, 108, 123, 125, 48, 
 	57, 65, 90, 97, 122, 9, 32, 95, 
 	48, 57, 65, 90, 97, 122, 95, 48, 
@@ -36,66 +38,69 @@ static const char _Lexer_trans_keys[] = {
 };
 
 static const char _Lexer_single_lengths[] = {
-	0, 15, 2, 1, 1, 2, 2, 2, 
-	2
+	0, 1, 2, 16, 2, 1, 1, 2, 
+	2, 2, 2
 };
 
 static const char _Lexer_range_lengths[] = {
-	0, 3, 0, 3, 3, 3, 3, 3, 
-	3
+	0, 3, 3, 3, 0, 3, 3, 3, 
+	3, 3, 3
 };
 
 static const char _Lexer_index_offsets[] = {
-	0, 0, 19, 22, 27, 32, 38, 44, 
-	50
+	0, 0, 5, 11, 31, 34, 39, 44, 
+	50, 56, 62
 };
 
 static const char _Lexer_indicies[] = {
-	0, 2, 0, 3, 4, 5, 6, 7, 
-	9, 10, 11, 12, 13, 14, 15, 8, 
-	11, 11, 1, 0, 0, 16, 11, 8, 
-	11, 11, 17, 11, 11, 11, 11, 18, 
-	11, 20, 11, 11, 11, 19, 11, 21, 
-	11, 11, 11, 19, 11, 22, 11, 11, 
-	11, 19, 11, 23, 11, 11, 11, 19, 
-	0
+	0, 0, 0, 0, 1, 2, 0, 0, 
+	0, 0, 1, 3, 4, 3, 5, 6, 
+	7, 8, 9, 10, 12, 13, 14, 15, 
+	16, 17, 18, 11, 14, 14, 1, 3, 
+	3, 19, 14, 11, 14, 14, 20, 14, 
+	14, 14, 14, 21, 14, 23, 14, 14, 
+	14, 22, 14, 24, 14, 14, 14, 22, 
+	14, 25, 14, 14, 14, 22, 14, 26, 
+	14, 14, 14, 22, 0
 };
 
 static const char _Lexer_trans_targs[] = {
-	2, 0, 1, 1, 1, 1, 1, 1, 
-	3, 1, 1, 4, 5, 7, 1, 1, 
-	1, 1, 1, 1, 6, 4, 8, 4
+	2, 0, 3, 4, 3, 1, 3, 3, 
+	3, 3, 3, 5, 3, 3, 6, 7, 
+	9, 3, 3, 3, 3, 3, 3, 8, 
+	6, 10, 6
 };
 
 static const char _Lexer_trans_actions[] = {
-	0, 0, 23, 9, 11, 19, 17, 7, 
-	0, 5, 21, 39, 0, 0, 13, 15, 
-	29, 25, 31, 27, 0, 33, 0, 36
+	0, 0, 5, 0, 25, 0, 11, 13, 
+	21, 19, 9, 0, 7, 23, 41, 0, 
+	0, 15, 17, 31, 27, 33, 29, 0, 
+	35, 0, 38
 };
 
 static const char _Lexer_to_state_actions[] = {
-	0, 1, 0, 0, 0, 0, 0, 0, 
-	0
+	0, 0, 0, 1, 0, 0, 0, 0, 
+	0, 0, 0
 };
 
 static const char _Lexer_from_state_actions[] = {
-	0, 3, 0, 0, 0, 0, 0, 0, 
-	0
+	0, 0, 0, 3, 0, 0, 0, 0, 
+	0, 0, 0
 };
 
 static const char _Lexer_eof_trans[] = {
-	0, 0, 17, 18, 19, 20, 20, 20, 
-	20
+	0, 0, 0, 0, 20, 21, 22, 23, 
+	23, 23, 23
 };
 
-static const int Lexer_start = 1;
-static const int Lexer_first_final = 1;
+static const int Lexer_start = 3;
+static const int Lexer_first_final = 3;
 static const int Lexer_error = 0;
 
-static const int Lexer_en_main = 1;
+static const int Lexer_en_main = 3;
 
 
-#line 67 "../src/lexer.rl"
+#line 71 "../src/lexer.rl"
 
 
 Lexer::Lexer(const char* p_, const char* pe_)
@@ -105,7 +110,7 @@ Lexer::Lexer(const char* p_, const char* pe_)
 	orig_(p_),
 	line_beg_(orig_) {
 	
-#line 102 "../src/lexer_gen.cpp"
+#line 107 "../src/lexer_gen.cpp"
 	{
 	cs = Lexer_start;
 	ts = 0;
@@ -113,12 +118,12 @@ Lexer::Lexer(const char* p_, const char* pe_)
 	act = 0;
 	}
 
-#line 76 "../src/lexer.rl"
+#line 80 "../src/lexer.rl"
 }
 
 void Lexer::next_lexeme(Token* tok) {
 	
-#line 111 "../src/lexer_gen.cpp"
+#line 116 "../src/lexer_gen.cpp"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -139,7 +144,7 @@ _resume:
 #line 1 "NONE"
 	{ts = p;}
 	break;
-#line 130 "../src/lexer_gen.cpp"
+#line 135 "../src/lexer_gen.cpp"
 		}
 	}
 
@@ -218,47 +223,53 @@ _eof_trans:
 	{act = 2;}
 	break;
 	case 5:
-#line 34 "../src/lexer.rl"
-	{act = 4;}
+#line 38 "../src/lexer.rl"
+	{act = 5;}
 	break;
 	case 6:
-#line 38 "../src/lexer.rl"
-	{te = p+1;{ tok->lex = SEMICOL; {p++; goto _out; } }}
+#line 34 "../src/lexer.rl"
+	{te = p+1;{ 
+		tok->ident = std::string(ts, te);
+		tok->lex  = STR; {p++; goto _out; } }}
 	break;
 	case 7:
-#line 40 "../src/lexer.rl"
-	{te = p+1;{ tok->lex = COMMA; {p++; goto _out; } }}
+#line 42 "../src/lexer.rl"
+	{te = p+1;{ tok->lex = SEMICOL; {p++; goto _out; } }}
 	break;
 	case 8:
-#line 42 "../src/lexer.rl"
-	{te = p+1;{ tok->lex = CIRC_OPEN; {p++; goto _out; } }}
+#line 44 "../src/lexer.rl"
+	{te = p+1;{ tok->lex = COMMA; {p++; goto _out; } }}
 	break;
 	case 9:
-#line 44 "../src/lexer.rl"
-	{te = p+1;{ tok->lex = CIRC_CLOSE; {p++; goto _out; } }}
+#line 46 "../src/lexer.rl"
+	{te = p+1;{ tok->lex = CIRC_OPEN; {p++; goto _out; } }}
 	break;
 	case 10:
-#line 46 "../src/lexer.rl"
-	{te = p+1;{ tok->lex = FIG_OPEN; {p++; goto _out; } }}
+#line 48 "../src/lexer.rl"
+	{te = p+1;{ tok->lex = CIRC_CLOSE; {p++; goto _out; } }}
 	break;
 	case 11:
-#line 48 "../src/lexer.rl"
-	{te = p+1;{ tok->lex = FIG_CLOSE; {p++; goto _out; } }}
+#line 50 "../src/lexer.rl"
+	{te = p+1;{ tok->lex = FIG_OPEN; {p++; goto _out; } }}
 	break;
 	case 12:
-#line 50 "../src/lexer.rl"
-	{te = p+1;{ tok->lex = PLUS; {p++; goto _out; } }}
+#line 52 "../src/lexer.rl"
+	{te = p+1;{ tok->lex = FIG_CLOSE; {p++; goto _out; } }}
 	break;
 	case 13:
-#line 52 "../src/lexer.rl"
-	{te = p+1;{ tok->lex = MUL; {p++; goto _out; } }}
+#line 54 "../src/lexer.rl"
+	{te = p+1;{ tok->lex = PLUS; {p++; goto _out; } }}
 	break;
 	case 14:
-#line 54 "../src/lexer.rl"
-	{te = p+1;{ tok->lex = EQUAL; {p++; goto _out; } }}
+#line 56 "../src/lexer.rl"
+	{te = p+1;{ tok->lex = MUL; {p++; goto _out; } }}
 	break;
 	case 15:
 #line 58 "../src/lexer.rl"
+	{te = p+1;{ tok->lex = EQUAL; {p++; goto _out; } }}
+	break;
+	case 16:
+#line 62 "../src/lexer.rl"
 	{te = p+1;{
 		line_beg_ = p + 1; // Skip new line character
 		++line_;
@@ -267,7 +278,7 @@ _eof_trans:
 		{p++; goto _out; }
 	}}
 	break;
-	case 16:
+	case 17:
 #line 28 "../src/lexer.rl"
 	{te = p;p--;{
 		tok->lex = NUMBER;
@@ -275,17 +286,17 @@ _eof_trans:
 		{p++; goto _out; }
 	}}
 	break;
-	case 17:
-#line 34 "../src/lexer.rl"
+	case 18:
+#line 38 "../src/lexer.rl"
 	{te = p;p--;{ 
 		tok->ident = std::string(ts, te);
 		tok->lex  = IDENT; {p++; goto _out; } }}
 	break;
-	case 18:
-#line 56 "../src/lexer.rl"
+	case 19:
+#line 60 "../src/lexer.rl"
 	{te = p;p--;{ tok->lex = SPACE; {p++; goto _out; } }}
 	break;
-	case 19:
+	case 20:
 #line 1 "NONE"
 	{	switch( act ) {
 	case 1:
@@ -294,7 +305,7 @@ _eof_trans:
 	case 2:
 	{{p = ((te))-1;} tok->lex = LET; {p++; goto _out; } }
 	break;
-	case 4:
+	case 5:
 	{{p = ((te))-1;} 
 		tok->ident = std::string(ts, te);
 		tok->lex  = IDENT; {p++; goto _out; } }
@@ -302,7 +313,7 @@ _eof_trans:
 	}
 	}
 	break;
-#line 274 "../src/lexer_gen.cpp"
+#line 284 "../src/lexer_gen.cpp"
 		}
 	}
 
@@ -315,7 +326,7 @@ _again:
 #line 1 "NONE"
 	{ts = 0;}
 	break;
-#line 285 "../src/lexer_gen.cpp"
+#line 295 "../src/lexer_gen.cpp"
 		}
 	}
 
@@ -335,7 +346,7 @@ _again:
 	_out: {}
 	}
 
-#line 80 "../src/lexer.rl"
+#line 84 "../src/lexer.rl"
 	offset_ = p - orig_;
 	tok->line = line_;
 	tok->col  = col_;

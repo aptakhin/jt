@@ -16,8 +16,12 @@ void ParseState::push_var(int n) {
 	flow->add(make_ivar(n));
 }
 
-void ParseState::push_var(const String& n) {
-	auto get = FuncCall("op_get", make_svar(n));
+void ParseState::push_var(const char* str) {
+	flow->add(make_svar(str));
+}
+
+void ParseState::push_ident(const char* id) {
+	auto get = FuncCall("op_get", make_svar(id));
 	flow->add(get);
 }
 
@@ -53,8 +57,12 @@ void ParseContext::put_var(int number) {
 	states_->push_var(number);
 }
 
-void ParseContext::put_var(const String& n) {
-	states_->push_var(n);
+void ParseContext::put_var(const char* str) {
+	states_->push_var(str);
+}
+
+void ParseContext::put_ident(const char* id) {
+	states_->push_ident(id);
 }
 
 void ParseContext::func_call(const String& name) {

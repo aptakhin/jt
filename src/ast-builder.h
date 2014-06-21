@@ -14,7 +14,8 @@ public:
 
 	void push(Node v);
 	void push_var(int number);
-	void push_var(const String& n);
+	void push_var(const char* str);
+	void push_ident(const char* str);
 
 	Flow flow;
 
@@ -45,7 +46,8 @@ public:
 	void def_end();
 
 	void put_var(int number);
-	void put_var(const String& n);
+	void put_var(const char* str);
+	void put_ident(const char* str);
 
 	void func_call(const String& name);
 	void func_call_end();

@@ -44,6 +44,10 @@ Var jt_plus(CallUnit*, FuncTermImpl*, IntTermImpl* a, IntTermImpl* b) {
 	return make_ivar(a->number() + b->number());
 }
 
+Var jt_pluss(CallUnit*, FuncTermImpl*, StringTermImpl* a, StringTermImpl* b) {
+	return make_svar(a->str() + b->str());
+}
+
 Var jt_mul(CallUnit*, FuncTermImpl*, IntTermImpl* a, IntTermImpl* b) {
 	return make_ivar(a->number() * b->number());
 }
@@ -123,6 +127,7 @@ public:
 		ctx->add_named("print",   def_func<IntTermImpl>(jt_prints, "to_print", print_init_args));
 		ctx->add_named("op_get",  def_func<IntTermImpl>(jt_get,    "var"));
 		ctx->add_named("op_plus", def_func<IntTermImpl>(jt_plus,   "a", "b"));
+		ctx->add_named("op_plus", def_func<IntTermImpl>(jt_pluss,  "a", "b"));
 		ctx->add_named("op_mul",  def_func<IntTermImpl>(jt_mul,    "a", "b"));
 		ctx->add_named("op_eq",   def_func<BoolTermImpl>(jt_eq,    "a", "b"));
 	}
@@ -381,6 +386,18 @@ TEST_F(BaseTest, DefFuncI3) {
 	parser_->push("def func(a) { a * 2 + 1; } x = func(31);");
 	call_print("x");
 	TEST_OUT("63");
+}
+
+TEST_F(BaseTest, DefFuncDouble) {
+	parser_->push("def func(a) { a + a; } x = func(2);");
+	call_print("x");
+	TEST_OUT("4");
+}
+
+TEST_F(BaseTest, DefFuncDoubleStr) {
+	parser_->push("def func(a) { a + a; } x = func(\"Hello\");");
+	call_print("x");
+	TEST_OUT("HelloHello");
 }
 
 //Failing

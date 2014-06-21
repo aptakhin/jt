@@ -31,6 +31,10 @@ main := |*
 		fbreak;
 	};
 
+	'"'([a-zA-Z0-9_])+'"' => { 
+		tok->ident = std::string(ts, te);
+		tok->lex  = STR; fbreak; };
+
 	([a-zA-Z0-9_])+ => { 
 		tok->ident = std::string(ts, te);
 		tok->lex  = IDENT; fbreak; };

@@ -67,7 +67,8 @@ class ParseContext;
      PLUS = 270,
      MUL = 271,
      IDENT = 272,
-     NUMBER = 273
+     STR = 273,
+     NUMBER = 274
    };
 #endif
 
@@ -86,7 +87,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 90 "../src/parser_gen.hpp"
+#line 91 "../src/parser_gen.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -141,4 +142,4 @@ typedef struct YYLTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 145 "../src/parser_gen.hpp"
+#line 146 "../src/parser_gen.hpp"

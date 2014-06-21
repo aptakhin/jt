@@ -214,10 +214,10 @@ Term CallUnit::exec_node(Node node) {
 		break;
 
 	case NodeType::VAR: {
-		auto n = node.impl<VarImpl>();
+		auto var  = node.impl<VarImpl>();
 		auto calc = resolve(node);
 		tm = calc->term();
-		stack_.back()->add_named(n->name(), tm);
+		stack_.back()->add_named(var->name(), tm);
 		return tm;
 	}
 		break;
