@@ -20,36 +20,46 @@ Term Inferencer::local(Node node) {
 	}
 		break;
 
+	case NodeType::SEQ: {
+		auto seq = node.impl<SeqImpl>();
+		for (auto& i: seq->vars()) {
+			auto term = local(i);
+			if (!i->term())
+				i->set_term(term);
+		}
+	}
+		break;
+
 	case NodeType::VAR: {
-		auto n = node.impl<VarImpl>();
-		auto tm = n->term();
-		if (!n->term()) {
-			auto set = n->value();
+		auto var = node.impl<VarImpl>();
+		auto tm  = var->term();
+		if (!var->term()) {
+			auto set = var->value();
 			tm = local(set);
 			if (set->type() == NodeType::FUNC_CALL)
 				set->set_term(tm);
 			else
-				n->set_term(tm);
+				var->set_term(tm);
 		}
 
-		if (auto func = n->term().as<FuncTermImpl>()) {
-			if (n->term().is_abstract()) {
+		if (auto func = var->term().as<FuncTermImpl>()) {
+			if (var->term().is_abstract()) {
 				// Setup input parameters, output
 				auto flow = func->flow();
 				auto term = local(flow);
 			}
 		}
 
-		if (!n->name().empty())
-			stack_.back()->add_named(n->name(), tm);
+		if (!var->name().empty())
+			stack_.back()->add_named(var->name(), tm);
 		return tm;
 	}
 		break;
 
 	case NodeType::FUNC_CALL: {
-		auto n = node.impl<FuncCallImpl>();
+		auto call = node.impl<FuncCallImpl>();
 		Seq args;
-		for (auto& i: n->flow()) {
+		for (auto& i: call->flow()) {
 			Term var_term = i->term();
 			if (!i->term()) {
 				var_term = local(i);
@@ -59,11 +69,27 @@ Term Inferencer::local(Node node) {
 			}
 			args->add(make_var(var_term));
 		}
-		auto found = stack_.back()->find_named(n->name(), args);
+		auto found = stack_.back()->find_named(call->name(), args);
 
 		if (auto func = found.as<FuncTermImpl>()) {
 			if (found.is_abstract()) {
+				// It's function with generic types
+				auto specialized = func->do_clone();
+				// Cloning all function and setup with arguments called.
+				auto found = make_term_move_ptr(specialized);
+				found.set_abstract(false);
+
+				for (auto i: zip(args->vars(), specialized->args()->vars())) {
+					auto set = i.fst->impl()->term().clone();
+					i.snd->impl()->set_term(set);
+				}
+
+				stack_.back()->add_named(call->name(), found);
+
 				// Setup input parameters, output
+				Inferencer inf(*specialized, nullptr);
+				inf.local(args); // Pass args
+				inf.local(specialized->flow());
 				auto flow = func->flow();
 				auto term = local(flow);
 			}

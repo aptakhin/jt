@@ -20,12 +20,12 @@ public:
 	Optional<Term> find(void* node);
 
 	void add_named(const String& name, Term term);
-	Term find_named(const String& name, Seq arg_types);
+	Term find_named(const String& name, Seq arg_types, Context*& out_parent);
 
 	int suits(Seq proto_types, Seq input_types);
 
 protected:
-	Term find_best(const String& name, Seq arg_types, int& score);
+	Term find_best(const String& name, Seq arg_types, int& score, Context*& out_parent);
 
 protected:
 	ContextSPtr parent_;

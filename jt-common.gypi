@@ -7,6 +7,7 @@
 			'msvs_settings': {
 				'VCCLCompilerTool': {
 					'RuntimeLibrary': 1, 
+					'Optimization': 0,
 				},
 				'VCLinkerTool': {
 					'OptimizeReferences': 2,

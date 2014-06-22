@@ -4,7 +4,7 @@
 namespace jt {
 
 bool operator == (const TermType& a, const TermType& b) {
-	return a.base() == b.base();
+	return a.base() == b.base() && a.name() == b.name();
 }
 
 bool operator != (const TermType& a, const TermType& b) {
@@ -137,8 +137,8 @@ void SeqImpl::do_visit(IVisitor* vis) const {
 VarImpl* VarImpl::do_clone() const {
 	auto var = new VarImpl();
 	var->set_name(name_);
-	var->set_value(value().clone());
-	var->set_term(term().clone());
+	if (value_) var->set_value(value_.clone());
+	if (term()) var->set_term(term().clone());
 	return var;
 }
 

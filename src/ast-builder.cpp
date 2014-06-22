@@ -102,6 +102,7 @@ void ParseContext::put_func_call_all(const String& name, size_t args) {
 void ParseContext::func_def(const String& name) {
 	states_.push();
 	states_->func = new FuncTermImpl;
+	states_->func->type().set_name(name);
 	states_->var  = new VarImpl;
 	states_->var->set_term(make_term_move_ptr(states_->func));
 	states_->var->set_name(name);

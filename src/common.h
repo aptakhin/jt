@@ -182,6 +182,66 @@ Optional<typename Container::mapped_type> iter2optional(typename Container::cons
 bool starts_with(const String& str, const char* is_prefix);
 bool starts_with(const String& str, const String& is_prefix);
 
+template <typename ContA, typename ContB>
+class Zip {
+public:
+	typedef typename ContA::value_type ValA;
+	typedef typename ContB::value_type ValB;
+
+	Zip(ContA& a, ContB& b)
+	:	begin_(a.begin(), b.begin()),
+		end_(a.end(), b.end()) {
+	}
+
+	template <typename IterA, typename IterB>
+	class Iter {
+	private:
+		friend class Zip;
+
+		Iter(IterA ait, IterB bit) 
+		:	ait_(ait), bit_(bit) {}
+
+	public:
+		Iter& operator ++() {
+			++ait_, ++bit_;
+			return *this;
+		}
+
+		bool operator == (const Iter& other) const {
+			return ait_ == other.ait_ && bit_ == other.bit_;
+		}
+
+		bool operator != (const Iter& other) const {
+			return !(*this == other);
+		}
+
+		Iter& operator * () {
+			fst = &*ait_; snd = &*bit_;
+			return *this;
+		}
+
+		ValA* fst;
+		ValB* snd;
+
+	private:
+		IterA ait_;
+		IterB bit_;
+	};
+
+	typedef Iter<typename ContA::iterator, typename ContB::iterator> It;
+
+	It begin() const { return begin_; }
+	It end() const { return end_; }
+
+private:
+	It begin_, end_;
+};
+
+template <typename ContA, typename ContB>
+Zip<ContA, ContB> zip(ContA& a, ContB& b) {
+	return {a, b};
+}
+
 class ParserContext;
 class FuncTermImpl;
 

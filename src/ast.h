@@ -131,11 +131,17 @@ public:
 	};
 
 	TermType(Type type) : type_(type) {}
+	TermType(Type type, const String& name) : type_(type), name_(name) {}
 
 	Type base() const { return type_; }
 
+	void set_name(const String& name) { name_ = name; }
+
+	const String& name() const { return name_; }
+
 private:
-	Type type_;
+	Type   type_;
+	String name_;
 };
 
 bool operator == (const TermType& a, const TermType& b);
@@ -461,6 +467,7 @@ typedef Var(*JtNative) (Seq);
 
 template <typename A1>
 Var func_map_seq(void* func, CallUnit* unit, FuncTermImpl* parent, Seq args) {
+	JT_COMP_ASSERT(args->vars().size() == 1, "Must set only 1 argument");
 	assert(args->vars().size() == 1);
 	typedef Var(*NativeFunc) (CallUnit*, FuncTermImpl*, A1*);
 	NativeFunc native_func = (NativeFunc) func;
@@ -470,7 +477,7 @@ Var func_map_seq(void* func, CallUnit* unit, FuncTermImpl* parent, Seq args) {
 
 template <typename A1, typename A2>
 Var func_map_seq(void* func, CallUnit* unit, FuncTermImpl* parent, Seq args) {
-	assert(args->vars().size() == 2);
+	JT_COMP_ASSERT(args->vars().size() == 2, "Must set only 2 arguments");
 	typedef Var(*NativeFunc) (CallUnit*, FuncTermImpl*, A1*, A2*);
 	NativeFunc native_func = (NativeFunc) func;
 	auto a0 = args->vars()[0]->term().impl<A1>();
@@ -501,7 +508,6 @@ public:
 private:
 	NativeMapper call_;
 	void (*native_func_)(...);
-	std::vector<String> names_;
 };
 
 JT_AST_NODE(NativeFuncCall) {
@@ -549,11 +555,11 @@ public:
 	void set_ret(Var ret) { ret_ = ret; }
 
 private:
-	Seq args_;
+	Seq  args_;
 	Flow flow_;
-	Var ret_;
+	Var  ret_;
 
-	Seq init_args_;
+	Seq  init_args_;
 };
 
 JT_AST_NODE(If) {

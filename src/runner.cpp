@@ -18,12 +18,12 @@ void Context::add_named(const String& name, Term term) {
 	terms_named_.insert(std::make_pair(name, term));
 }
 
-Term Context::find_named(const String& name, Seq arg_types) {
+Term Context::find_named(const String& name, Seq arg_types, Context*& out_parent) {
 	int best_score = 0;
 	return find_best(name, arg_types, best_score);
 }
 
-Term Context::find_best(const String& name, Seq arg_types, int& best_score) {
+Term Context::find_best(const String& name, Seq arg_types, int& best_score, Context*& out_parent) {
 	Term best;
 	auto r = terms_named_.equal_range(name);
 	for (auto i = r.first; i != r.second; ++i) {
@@ -37,12 +37,13 @@ Term Context::find_best(const String& name, Seq arg_types, int& best_score) {
 			if (score > best_score) {
 				best = i->second;
 				best_score = score;
+				out_parent = this;
 			}
 		}
 	}
 	if (parent_) {
 		int before_score = best_score;
-		auto parents = parent_->find_best(name, arg_types, best_score);
+		auto parents = parent_->find_best(name, arg_types, best_score, out_parent);
 		if (best_score > before_score)
 			best = parents;
 	}

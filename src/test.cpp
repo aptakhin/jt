@@ -79,7 +79,9 @@ Term def_func(Var(*func)(CallUnit*, FuncTermImpl*, A1*), const String& a1name, S
 		func_impl->set_flow(listed({ncall}));
 	}
 
-	return make_term_move_ptr(func_impl);
+	Term ret = make_term_move_ptr(func_impl);
+	ret.set_abstract(false);
+	return ret;
 }
 
 template <typename Ret, typename A1, typename A2>
@@ -103,7 +105,9 @@ Term def_func(Var(*func)(CallUnit*, FuncTermImpl*, A1*, A2*), const String& a1na
 		func_impl->set_flow(listed({ncall}));
 	}
 
-	return make_term_move_ptr(func_impl);
+	Term ret = make_term_move_ptr(func_impl);
+	ret.set_abstract(false);
+	return ret;
 }
 
 class BaseEnv {
@@ -388,6 +392,13 @@ TEST_F(BaseTest, DefFuncI3) {
 	TEST_OUT("63");
 }
 
+//Failing
+//TEST_F(BaseTest, DefFuncI4) {
+//	parser_->push("def func(a) { a * 2 + 1; } x = 1 + func(31);");
+//	call_print("x");
+//	TEST_OUT("64");
+//}
+
 TEST_F(BaseTest, DefFuncDouble) {
 	parser_->push("def func(a) { a + a; } x = func(2);");
 	call_print("x");
@@ -399,13 +410,6 @@ TEST_F(BaseTest, DefFuncDoubleStr) {
 	call_print("x");
 	TEST_OUT("HelloHello");
 }
-
-//Failing
-//TEST_F(BaseTest, DefFuncI4) {
-//	parser_->push("def func(a) { a * 2 + 1; } x = 1 + func(31);");
-//	call_print("x");
-//	TEST_OUT("64");
-//}
 
 class FileTest : private BaseEnv {
 public:
