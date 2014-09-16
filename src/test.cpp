@@ -149,7 +149,7 @@ class BaseTest : public ::testing::Test, public BaseEnv {
 protected:
 	void SetUp() override {
 		setup_env();
-		JT_TRACE((String() + "Running test" + ::testing::UnitTest::GetInstance()->current_test_info()->name()).c_str());
+		JT_TRACE(String() + "Running test" + ::testing::UnitTest::GetInstance()->current_test_info()->name());
 	}
 
 	void TearDown() override {

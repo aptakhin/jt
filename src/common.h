@@ -6,15 +6,16 @@
 #include <stdexcept>
 #include <string>
 #include <sstream>
+#include <iostream>
 #include <memory>
 #include <cstdint>
 #include <algorithm>
 #include <type_traits>
 #include <tuple>
+#include <vector>
+
 #define NOMINMAX
 #include <windows.h>
-
-#include "report.h"
 
 namespace jt {
 
@@ -34,6 +35,9 @@ typedef double   r8;
 typedef std::string String;
 
 #define assert(Expr) { if (!(Expr)) { _CrtDbgBreak(); } }
+
+#define JT_CONCAT_IMPL(a, b) a##b
+#define JT_CONCAT(a, b) JT_CONCAT_IMPL(a, b)
 
 template <class T>
 class TypeStorage {
@@ -246,3 +250,5 @@ class ParserContext;
 class FuncTermImpl;
 
 } // namespace jt {
+
+#include "report.h"

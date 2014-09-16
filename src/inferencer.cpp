@@ -34,9 +34,11 @@ Term Inferencer::local(Node node) {
 		break;
 
 	case NodeType::VAR: {
+		JT_TRACE_SCOPE("Var");
 		auto var = node.impl<VarImpl>();
 		auto tm  = var->term();
 		if (!var->term()) {
+			JT_TRACE_SCOPE("Inferencing call");
 			auto set = var->value();
 			tm = local(set);
 			if (set->type() == NodeType::FUNC_CALL)
@@ -60,11 +62,15 @@ Term Inferencer::local(Node node) {
 		break;
 
 	case NodeType::FUNC_CALL: {
+		JT_TRACE_SCOPE("FuncCall");
 		auto call = node.impl<FuncCallImpl>();
 		Seq args;
+		JT_TRACE_SCOPE("Inference calls flow");
 		for (auto& i: call->flow()) {
 			Term var_term = i->term();
+			JT_TRACE_SCOPE("Term");
 			if (!i->term()) {
+				JT_TRACE_SCOPE("Evaluating");
 				var_term = local(i);
 				if (!var_term)
 					JT_COMP_ERR("Term wasn't evaluated");

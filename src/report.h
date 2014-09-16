@@ -19,10 +19,13 @@ public:
 	Report(ReportLevel level, const char* file, int line, const char* msg)
 	:	level(level), file(file), line(line), msg(msg) {}
 
+	Report(ReportLevel level, const char* file, int line, const String& m)
+	:	level(level), file(file), line(line), msg(m) {}
+
 	ReportLevel level;
 	const char* file;
 	int line;
-	const char* msg;
+	const String msg;
 };
 
 class IReportOut {
@@ -68,7 +71,7 @@ private:
 
 extern OstreamReportOut RepOut; // See test.cpp for definition
 
-#define JT_TRACE_SCOPE(msg) JT_TRACE(msg); OstreamReportOutScopeOffset trace_scope_##__LINE__(RepOut);
+#define JT_TRACE_SCOPE(msg) JT_TRACE(msg); OstreamReportOutScopeOffset JT_CONCAT(trace_scope_, __LINE__)(RepOut);
 
 class Win32DbgReportOut : public IReportOut {
 public:
