@@ -149,6 +149,11 @@ class BaseTest : public ::testing::Test, public BaseEnv {
 protected:
 	void SetUp() override {
 		setup_env();
+		JT_TRACE((String() + "Running test" + ::testing::UnitTest::GetInstance()->current_test_info()->name()).c_str());
+	}
+
+	void TearDown() override {
+		JT_TRACE("\n------------------------------------------------------------------\n");
 	}
 
 #define TEST_OUT(t_out) { exec(); ASSERT_EQ(t_out, out_.str()); }
@@ -162,6 +167,7 @@ protected:
 		std::ofstream fout(name.c_str());
 		fout << parser_->str() << std::endl << std::endl;
 
+		JT_TRACE_SCOPE("Starting inferencer");
 		inf.local(run_->flow());
 
 		AstPrinter print(fout);
@@ -432,7 +438,7 @@ public:
 		return res;
 	}
 
-	void do_test() {
+	void run_test() {
 		enum ReadState {
 			SOURCE,
 			OUTPUT,
@@ -484,15 +490,20 @@ protected:
 
 TEST(FileTest, Test0) {
 	FileTest test("../../tests/test0.txt");
-	test.do_test();
+	test.run_test();
+}
+
+namespace jt {
+	std::ofstream trace_file("trace.txt");
+	OstreamReportOut RepOut(trace_file);
 }
 
 int main(int argc, char** argv) {
 	testing::InitGoogleTest(&argc, argv);
-	auto out  = std::make_unique<OstreamReportOut>(std::cout);
-	auto out2 = std::make_unique<Win32DbgReportOut>();
-	Rep.add_out(out.get());
-	Rep.add_out(out2.get());
+	Win32DbgReportOut win32trace;
+	
+	Rep.add_out(&RepOut);
+	Rep.add_out(&win32trace);
 	int result = RUN_ALL_TESTS();
 	if (result != 0)
 		int p = 0;

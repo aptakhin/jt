@@ -7,7 +7,7 @@ namespace jt {
 
 Reports Rep;
 
-std::string BaseReportFormatter::format(const Report& report, bool show_file_path) {
+std::string BaseReportFormatter::format(const Report& report, int offset, bool show_file_path) {
 	std::string print_file = report.file;
 	if (!show_file_path) {
 		auto found = print_file.find_last_of("\\");
@@ -15,7 +15,9 @@ std::string BaseReportFormatter::format(const Report& report, bool show_file_pat
 			print_file = print_file.substr(found + 1, print_file.size() - found - 1);
 	}
 	std::ostringstream out;
-	out << print_file << "(" << report.line << "): " << report.msg << std::endl;
+	while (offset--)
+		out << "  ";
+	out << print_file << "(" << report.line << "): " << report.msg;
 	return out.str();
 }
 
@@ -27,7 +29,7 @@ void OstreamReportOut::out(const Report& report) {
 }
 
 void OstreamReportOut::out_impl(const Report& report) {
-	out_ << BaseReportFormatter::format(report, false);
+	out_ << BaseReportFormatter::format(report, offset_, false) << std::endl;
 }
 
 void Win32DbgReportOut::out(const Report& report) {
@@ -35,7 +37,7 @@ void Win32DbgReportOut::out(const Report& report) {
 }
 
 void Win32DbgReportOut::out_impl(const Report& report) {
-	OutputDebugString(BaseReportFormatter::format(report, true).c_str());
+	OutputDebugString((BaseReportFormatter::format(report, 0, true) + "\n").c_str());
 }
 
 void Reports::report(const Report& report) {

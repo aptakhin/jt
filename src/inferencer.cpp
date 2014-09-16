@@ -9,8 +9,10 @@ Inferencer::Inferencer(FuncTermImpl& root, ContextSPtr ctx)
 }
 
 Term Inferencer::local(Node node) {
+	JT_TRACE_SCOPE("Local inference at node");
 	switch (node->type()) {
 	case NodeType::FLOW: {
+		JT_TRACE_SCOPE("Flow");
 		auto flow = node.impl<FlowImpl>();
 		for (auto& i: flow->flow()) {
 			auto term = local(i);
@@ -21,6 +23,7 @@ Term Inferencer::local(Node node) {
 		break;
 
 	case NodeType::SEQ: {
+		JT_TRACE_SCOPE("Seq");
 		auto seq = node.impl<SeqImpl>();
 		for (auto& i: seq->vars()) {
 			auto term = local(i);
@@ -69,13 +72,14 @@ Term Inferencer::local(Node node) {
 			}
 			args->add(make_var(var_term));
 		}
-		auto found = stack_.back()->find_named(call->name(), args);
+		Context* parent_ctx = nullptr;
+		auto found = stack_.back()->find_named(call->name(), args, parent_ctx);
 
 		if (auto func = found.as<FuncTermImpl>()) {
 			if (found.is_abstract()) {
 				// It's function with generic types
+				// Clone whole function content and setup with arguments called.
 				auto specialized = func->do_clone();
-				// Cloning all function and setup with arguments called.
 				auto found = make_term_move_ptr(specialized);
 				found.set_abstract(false);
 
@@ -84,14 +88,12 @@ Term Inferencer::local(Node node) {
 					i.snd->impl()->set_term(set);
 				}
 
-				stack_.back()->add_named(call->name(), found);
+				parent_ctx->add_named(call->name(), found);
 
 				// Setup input parameters, output
 				Inferencer inf(*specialized, nullptr);
 				inf.local(args); // Pass args
 				inf.local(specialized->flow());
-				auto flow = func->flow();
-				auto term = local(flow);
 			}
 		}
 
