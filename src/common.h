@@ -248,6 +248,8 @@ Zip<ContA, ContB> zip(ContA& a, ContB& b) {
 
 class ParserContext;
 class FuncTermImpl;
+class Term;
+class TermImpl;
 
 } // namespace jt {
 

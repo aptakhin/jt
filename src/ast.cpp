@@ -3,6 +3,10 @@
 
 namespace jt {
 
+NodeType Node::type() const {
+	return base_impl_->type();
+}
+
 bool operator == (const TermType& a, const TermType& b) {
 	return a.base() == b.base() && a.name() == b.name();
 }

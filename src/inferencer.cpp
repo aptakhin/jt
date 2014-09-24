@@ -34,8 +34,8 @@ Term Inferencer::local(Node node) {
 		break;
 
 	case NodeType::VAR: {
-		JT_TRACE_SCOPE("Var");
 		auto var = node.impl<VarImpl>();
+		JT_TRACE_SCOPE("Var: " + var->name());
 		auto tm  = var->term();
 		if (!var->term()) {
 			JT_TRACE_SCOPE("Inferencing call");
@@ -49,6 +49,7 @@ Term Inferencer::local(Node node) {
 
 		if (auto func = var->term().as<FuncTermImpl>()) {
 			if (var->term().is_abstract()) {
+				JT_TRACE_SCOPE("Inference var from function call");
 				// Setup input parameters, output
 				auto flow = func->flow();
 				auto term = local(flow);
@@ -62,20 +63,21 @@ Term Inferencer::local(Node node) {
 		break;
 
 	case NodeType::FUNC_CALL: {
-		JT_TRACE_SCOPE("FuncCall");
 		auto call = node.impl<FuncCallImpl>();
+		JT_TRACE_SCOPE("FuncCall: " + call->name());
 		Seq args;
 		JT_TRACE_SCOPE("Inference calls flow");
 		for (auto& i: call->flow()) {
 			Term var_term = i->term();
-			JT_TRACE_SCOPE("Term");
-			if (!i->term()) {
+			JT_TRACE_SCOPE("Call for node: " + type_name(i));
+			if (!var_term) {
 				JT_TRACE_SCOPE("Evaluating");
 				var_term = local(i);
 				if (!var_term)
 					JT_COMP_ERR("Term wasn't evaluated");
 				i->set_term(var_term);
 			}
+			JT_TRACE("Term type: " + type_name(var_term));
 			args->add(make_var(var_term));
 		}
 		Context* parent_ctx = nullptr;
@@ -120,6 +122,50 @@ Term Inferencer::local(Node node) {
 		break;
 	}
 	return Term();
+}
+
+String type_name(Term term) {
+	std::ostringstream out;
+	switch (term.type().base()) {
+	case TermType::BOOL: {
+		return "Bool";
+		//out << "(" << std::boolalpha << term.as<BoolTermImpl>()->boolean() << ")";
+	}
+
+	case TermType::STRING:
+		return "String";
+		//out << "(" << term.as<StringTermImpl>()->str() << ")";
+
+	case TermType::FUNC:
+		return "Func";
+		//auto func = term.as<FuncTermImpl>();
+		//out << traceable_print(func->init_args());
+		//out << traceable_print(func->flow());
+		return out.str();
+	}
+
+	return "Unknown";
+}
+
+String type_name(Node node) {
+	switch (node.type()) {
+	case NodeType::FLOW:
+		return "Flow";
+	case NodeType::FUNC:
+		return "Func";
+	case NodeType::FUNC_CALL:
+		return "FuncCall";
+	case NodeType::IF:
+		return "If";
+	case NodeType::NATIVE_FUNC_CALL:
+		return "NativeFuncCall";
+	case NodeType::SEQ:
+		return "Seq";
+	case NodeType::VAR:
+		return "Var";
+	}
+
+	return "Unknown";
 }
 
 } // namespace jt {

@@ -71,7 +71,7 @@ private:
 
 extern OstreamReportOut RepOut; // See test.cpp for definition
 
-#define JT_TRACE_SCOPE(msg) JT_TRACE(msg); OstreamReportOutScopeOffset JT_CONCAT(trace_scope_, __LINE__)(RepOut);
+#define JT_TRACE_SCOPE(msg) JT_TRACE((msg)); OstreamReportOutScopeOffset JT_CONCAT(trace_scope_, __LINE__)(RepOut);
 
 class Win32DbgReportOut : public IReportOut {
 public:

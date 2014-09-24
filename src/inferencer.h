@@ -20,4 +20,7 @@ protected:
 	ContextStack stack_;
 };
 
+String type_name(Node node);
+String type_name(Term term);
+
 } // namespace jt {

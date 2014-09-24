@@ -17,6 +17,17 @@ public:
 	BadNodeCast(const char* what) : std::logic_error(what) { _CrtDbgBreak(); }
 };
 
+enum class NodeType {
+	UNKNOWN,
+	FLOW,
+	SEQ,
+	VAR,
+	FUNC,
+	FUNC_CALL,
+	NATIVE_FUNC_CALL,
+	IF,
+};
+
 class Node {
 public:
 	Node(NodeImpl* impl) : base_impl_(impl) {}
@@ -58,6 +69,8 @@ public:
 		assert(is<Impl>());
 		return reinterpret_cast<Impl*>(base_impl_);
 	}
+
+	NodeType type() const;
 
 protected:
 	NodeImpl* base_impl_ = nullptr;
@@ -106,17 +119,6 @@ class Name : public AstNodeGuard< JT_CAT(Name, Impl) >\
 	Name(const std::initializer_list<Node>& init) : AstNodeGuard(new JT_CAT(Name, Impl)(init)) {}*/\
 };\
 class JT_CAT(Name, Impl) : public NodeImpl
-
-enum class NodeType {
-	UNKNOWN,
-	FLOW,
-	SEQ,
-	VAR,
-	FUNC,
-	FUNC_CALL,
-	NATIVE_FUNC_CALL,
-	IF,
-};
 
 class Term;
 
