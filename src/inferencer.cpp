@@ -1,5 +1,6 @@
 
 #include "inferencer.h"
+#include <gtest/gtest.h>
 
 namespace jt {
 
@@ -80,11 +81,16 @@ Term Inferencer::local(Node node) {
 			JT_TRACE("Term type: " + type_name(var_term));
 			args->add(make_var(var_term));
 		}
+
 		Context* parent_ctx = nullptr;
+		JT_TRACE_SCOPE("Try to find func: " + call->name() + " with args " + print_node(args));
 		auto found = stack_.back()->find_named(call->name(), args, parent_ctx);
 
 		if (auto func = found.as<FuncTermImpl>()) {
+			JT_TRACE_SCOPE("Found function");
 			if (found.is_abstract()) {
+				JT_TRACE("Function is abstract");
+				JT_TRACE("Specializing");
 				// It's function with generic types
 				// Clone whole function content and setup with arguments called.
 				auto specialized = func->do_clone();
@@ -99,11 +105,13 @@ Term Inferencer::local(Node node) {
 				parent_ctx->add_named(call->name(), found);
 
 				// Setup input parameters, output
-				Inferencer inf(*specialized, nullptr);
+				Inferencer inf(*specialized, stack_.front());
 				inf.local(args); // Pass args
 				inf.local(specialized->flow());
 			}
 		}
+		else
+			JT_TRACE("No function found");
 
 		if (found)
 			return found;
@@ -130,6 +138,22 @@ String type_name(Term term) {
 
 String type_name(Node node) {
 	return NodeTypeNames[unsigned(node.type())];
+}
+
+String print_node(Node node) {
+	switch (node.type()) {
+	case NodeType::SEQ: {
+		std::ostringstream out;
+		auto seq = Seq(node.impl<SeqImpl>());
+		out << "(";
+		out << str_join(", ", seq->vars(), [] (const Var& v) -> String { 
+			return type_name(v->term()); 
+		} );
+		out << ")";
+		return out.str();
+	}
+	}
+	return "()";
 }
 
 } // namespace jt {

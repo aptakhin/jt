@@ -98,4 +98,6 @@ extern Reports Rep;
 #define JT_TRACE(msg) { Rep.report(Report(ReportLevel::NOTIF, __FILE__, __LINE__, (msg))); }
 #define JT_USER_ERR(msg) { Rep.report(Report(ReportLevel::USER_ERR, __FILE__, __LINE__, (msg))); _CrtDbgBreak(); }
 
+#define JT_TEST_DBG_SEEK(test, seek) { if (String(::testing::UnitTest::GetInstance()->current_test_info()->name()) == test) { static unsigned counter = (seek); --counter; if (!counter) { _CrtDbgBreak(); }  } }
+
 } // namespace jt {

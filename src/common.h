@@ -7,6 +7,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <functional>
 #include <memory>
 #include <cstdint>
 #include <algorithm>
@@ -250,6 +251,26 @@ class ParserContext;
 class FuncTermImpl;
 class Term;
 class TermImpl;
+
+template <typename Cont>
+String str_join(const String& separator, const Cont& cont, std::function<String (const typename Cont::value_type&)> func) {
+	String result;
+
+	typename Cont::const_iterator i = begin(cont);
+	typename Cont::const_iterator e = end(cont);
+
+	if (i == e)
+		return result;
+
+	do {
+		result += func(*i);
+		++i;
+		if (i != e)
+			result += separator;
+	} while (i != e);
+
+	return result;
+}
 
 } // namespace jt {
 
