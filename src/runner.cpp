@@ -232,11 +232,11 @@ Term CallUnit::exec_node(Node node) {
 		auto cond = resolve(iff->cond());
 		tm = cond->term();
 		JT_COMP_ASSERT(tm->type() == TermType::BOOL, 
-			"Inferencer error. Condition at if isn't boolean");
+			"Inferencer error. Condition in if isn't boolean");
 		if (auto condb = tm.as<BoolTermImpl>()) {
 			Node next_exec = condb->boolean()? iff->then() : iff->other();
 			if (next_exec) {
-				// context stack push!
+				// TODO: context stack push!
 				exec_node(next_exec);
 			}	
 		}

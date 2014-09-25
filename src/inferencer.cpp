@@ -68,6 +68,7 @@ Term Inferencer::local(Node node) {
 		JT_TRACE_SCOPE("FuncCall: " + call->name());
 		Seq args;
 		JT_TRACE_SCOPE("Inference calls flow");
+
 		for (auto& i: call->flow()) {
 			Term var_term = i->term();
 			JT_TRACE_SCOPE("Call for node: " + type_name(i));
@@ -84,6 +85,7 @@ Term Inferencer::local(Node node) {
 
 		Context* parent_ctx = nullptr;
 		JT_TRACE_SCOPE("Try to find func: " + call->name() + " with args " + print_node(args));
+
 		auto found = stack_.back()->find_named(call->name(), args, parent_ctx);
 
 		if (auto func = found.as<FuncTermImpl>()) {
@@ -146,7 +148,7 @@ String print_node(Node node) {
 		std::ostringstream out;
 		auto seq = Seq(node.impl<SeqImpl>());
 		out << "(";
-		out << str_join(", ", seq->vars(), [] (const Var& v) -> String { 
+		out << str_join(", ", seq->vars(), [] (const Var& v) { 
 			return type_name(v->term()); 
 		} );
 		out << ")";

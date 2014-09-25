@@ -39,6 +39,9 @@ Term l_make_term(const char* type) {
 	if (strcmp(type, "int") == 0)
 		return make_term<IntTermImpl>();
 
+	if (strcmp(type, "string") == 0)
+		return make_term<StringTermImpl>();
+
 	JT_COMP_ERR("Can't make term");
 	return Term();
 }
