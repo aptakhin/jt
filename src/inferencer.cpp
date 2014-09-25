@@ -125,47 +125,11 @@ Term Inferencer::local(Node node) {
 }
 
 String type_name(Term term) {
-	std::ostringstream out;
-	switch (term.type().base()) {
-	case TermType::BOOL: {
-		return "Bool";
-		//out << "(" << std::boolalpha << term.as<BoolTermImpl>()->boolean() << ")";
-	}
-
-	case TermType::STRING:
-		return "String";
-		//out << "(" << term.as<StringTermImpl>()->str() << ")";
-
-	case TermType::FUNC:
-		return "Func";
-		//auto func = term.as<FuncTermImpl>();
-		//out << traceable_print(func->init_args());
-		//out << traceable_print(func->flow());
-		return out.str();
-	}
-
-	return "Unknown";
+	return TermTypeNames[unsigned(term.type().base())];
 }
 
 String type_name(Node node) {
-	switch (node.type()) {
-	case NodeType::FLOW:
-		return "Flow";
-	case NodeType::FUNC:
-		return "Func";
-	case NodeType::FUNC_CALL:
-		return "FuncCall";
-	case NodeType::IF:
-		return "If";
-	case NodeType::NATIVE_FUNC_CALL:
-		return "NativeFuncCall";
-	case NodeType::SEQ:
-		return "Seq";
-	case NodeType::VAR:
-		return "Var";
-	}
-
-	return "Unknown";
+	return NodeTypeNames[unsigned(node.type())];
 }
 
 } // namespace jt {

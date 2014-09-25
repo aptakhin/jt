@@ -17,6 +17,7 @@ public:
 	BadNodeCast(const char* what) : std::logic_error(what) { _CrtDbgBreak(); }
 };
 
+/// \sa NodeTypeNames
 enum class NodeType {
 	UNKNOWN,
 	FLOW,
@@ -26,6 +27,18 @@ enum class NodeType {
 	FUNC_CALL,
 	NATIVE_FUNC_CALL,
 	IF,
+};
+
+/// \sa NodeType
+static const char* NodeTypeNames[] = {
+	"Unknown",
+	"Flow",
+	"Seq",
+	"Var",
+	"Func",
+	"FuncCall",
+	"NativeFuncCall",
+	"If"
 };
 
 class Node {
@@ -144,6 +157,14 @@ public:
 private:
 	Type   type_;
 	String name_;
+};
+
+static const char* TermTypeNames[] = {
+	"Unknown",
+	"Int4",
+	"Bool",
+	"String",
+	"Func"
 };
 
 bool operator == (const TermType& a, const TermType& b);
