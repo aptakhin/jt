@@ -398,7 +398,7 @@ TEST_F(BaseTest, DefFuncI3) {
 	TEST_OUT("63");
 }
 
-TEST_F(BaseTest, DISABLED_DefFuncI4) {
+TEST_F(BaseTest, DefFuncI4) {
 	parser_->push("def func(a) { a * 2 + 1; } x = 1 + func(31);");
 	call_print("x");
 	TEST_OUT("64");

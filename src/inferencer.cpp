@@ -84,9 +84,10 @@ Term Inferencer::local(Node node) {
 		}
 
 		Context* parent_ctx = nullptr;
+		//JT_TEST_DBG_SEEK("DefFuncI4", 8);
 		JT_TRACE_SCOPE("Try to find func: " + call->name() + " with args " + print_node(args));
 
-		auto found = stack_.back()->find_named(call->name(), args, parent_ctx);
+		auto found = stack_.back()->find_named(call->name(), args, &parent_ctx);
 
 		if (auto func = found.as<FuncTermImpl>()) {
 			JT_TRACE_SCOPE("Found function");

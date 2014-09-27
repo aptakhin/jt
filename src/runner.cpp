@@ -18,27 +18,29 @@ void Context::add_named(const String& name, Term term) {
 	terms_named_.insert(std::make_pair(name, term));
 }
 
-Term Context::find_named(const String& name, Seq arg_types, Context*& out_parent) {
+Term Context::find_named(const String& name, Seq arg_types, Context** out_parent) {
 	int best_score = 0;
 	return find_best(name, arg_types, best_score, out_parent);
 }
 
-Term Context::find_best(const String& name, Seq arg_types, int& best_score, Context*& out_parent) {
+Term Context::find_best(const String& name, Seq arg_types, int& best_score, Context** out_parent) {
 	Term best;
 	auto r = terms_named_.equal_range(name);
+	JT_TRACE_SCOPE("Searching");
 	for (auto i = r.first; i != r.second; ++i) {
 		if (arg_types->empty()) {
 			JT_COMP_ASSERT(best_score != 1, "Multiply names for empty query");
 			best_score = 1;
-			out_parent = this;
+			*out_parent = this;
 			return i->second;
 		}
 		if (auto is = i->second.as<FuncTermImpl>()) {
+			JT_TRACE_SCOPE("Test suits");
 			auto score = suits(is->args(), arg_types);
 			if (score > best_score) {
 				best = i->second;
 				best_score = score;
-				out_parent = this;
+				*out_parent = this;
 			}
 		}
 	}
@@ -58,19 +60,21 @@ int Context::suits(Seq proto_types, Seq input_types) {
 	int suits_score = 0;
 	auto j = begin(input_types);
 	for (auto& i: proto_types) {
+		JT_TRACE_SCOPE("Test term type");
 		auto input = (*j)->term()->type();
 		if (input == TermType::FUNC) {
 			auto func = (*j)->term().impl<FuncTermImpl>();
+			JT_COMP_ASSERT(func->ret()->term(), "No return term in func")
 			input = func->ret()->term()->type();
 		}
 		if (i->term()) {
-			if (i->term()->type() == input)
-				suits_score += 2;
-			else
+			if (i->term()->type() != input)
 				return 0;
+			suits_score += 2;
 		}
-		else
+		else {
 			suits_score += 1;
+		}
 		++j;
 	}
 	return suits_score;
@@ -123,7 +127,7 @@ Term CallUnit::exec() {
 
 Var CallUnit::bind(Var var) {
 	Context* parent_ctx = nullptr;
-	auto found = stack_.back()->find_named(var->name(), Seq(), parent_ctx);
+	auto found = stack_.back()->find_named(var->name(), Seq(), &parent_ctx);
 	JT_COMP_ASSERT(found, "Name not found");
 	Var ret;
 	ret->set_name(var->name());
@@ -140,7 +144,7 @@ Seq CallUnit::bind(Seq vars) {
 
 Term CallUnit::get_var(const String& name) {
 	Context* parent_ctx = nullptr;
-	auto found = stack_.back()->find_named(name, Seq(), parent_ctx);
+	auto found = stack_.back()->find_named(name, Seq(), &parent_ctx);
 	if (!found && parent_)
 		return parent_->get_var(name);
 	return found;
