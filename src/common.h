@@ -1,6 +1,5 @@
 // jt
 //
-
 #pragma once
 
 #include <stdexcept>

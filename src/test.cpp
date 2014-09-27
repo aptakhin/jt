@@ -398,11 +398,17 @@ TEST_F(BaseTest, DefFuncI3) {
 	TEST_OUT("63");
 }
 
-//TEST_F(BaseTest, DefFuncI4) {
-//	parser_->push("def func(a) { a * 2 + 1; } x = 1 + func(31);");
-//	call_print("x");
-//	TEST_OUT("64");
-//}
+TEST_F(BaseTest, DISABLED_DefFuncI4) {
+	parser_->push("def func(a) { a * 2 + 1; } x = 1 + func(31);");
+	call_print("x");
+	TEST_OUT("64");
+}
+
+TEST_F(BaseTest, DefFuncI5) {
+	parser_->push("def func(a) { a * 3 + 1; } x = func(31 + 2);");
+	call_print("x");
+	TEST_OUT("100");
+}
 
 TEST_F(BaseTest, DefFuncDouble) {
 	parser_->push("def func(a) { a + a; } x = func(2);");
@@ -410,11 +416,11 @@ TEST_F(BaseTest, DefFuncDouble) {
 	TEST_OUT("4");
 }
 
-//TEST_F(BaseTest, DefFuncDoubleStr) {
-//	parser_->push("def func(a) { a + a; } x = func(\"Hello\");");
-//	call_print("x");
-//	TEST_OUT("HelloHello");
-//}
+TEST_F(BaseTest, DISABLED_DefFuncDoubleStr) {
+	parser_->push("def func(a) { a + a; } x = func(\"Hello\");");
+	call_print("x");
+	TEST_OUT("HelloHello");
+}
 
 class FileTest : private BaseEnv {
 public:
@@ -423,7 +429,7 @@ public:
 		setup_env();
 	}
 
-	bool check(std::string& line, const char* to) {
+	bool check(const std::string& line, const char* to) {
 		bool res = starts_with(line, to);
 		if (!res)
 			return false;
