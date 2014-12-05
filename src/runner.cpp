@@ -231,14 +231,14 @@ Term CallUnit::exec_node(Node node) {
 		break;
 
 	case NodeType::IF: {
-		auto iff = node.impl<IfImpl>();
+		auto branch = node.impl<IfImpl>();
 		stack_.push_back(std::make_shared<Context>(stack_.back()));
-		auto cond = resolve(iff->cond());
-		tm = cond->term();
+		auto condition = resolve(branch->cond());
+		tm = condition->term();
 		JT_COMP_ASSERT(tm->type() == TermType::BOOL, 
 			"Inferencer error. Condition in if isn't boolean");
-		if (auto condb = tm.as<BoolTermImpl>()) {
-			Node next_exec = condb->boolean()? iff->then() : iff->other();
+		if (auto cond = tm.as<BoolTermImpl>()) {
+			Node next_exec = cond->boolean()? branch->then() : branch->other();
 			if (next_exec) {
 				// TODO: context stack push!
 				exec_node(next_exec);
