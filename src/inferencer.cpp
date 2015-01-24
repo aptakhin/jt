@@ -90,7 +90,7 @@ Term Inferencer::local(Node node) {
 		auto found = stack_.back()->find_named(call->name(), args, &parent_ctx);
 
 		if (auto func = found.as<FuncTermImpl>()) {
-			JT_TRACE_SCOPE("Found function");
+			JT_TRACE_SCOPE("Found function: " + call->name());
 			if (found.is_abstract()) {
 				JT_TRACE("Function is abstract");
 				JT_TRACE("Specializing");
@@ -111,6 +111,11 @@ Term Inferencer::local(Node node) {
 				Inferencer inf(*specialized, stack_.front());
 				inf.local(args); // Pass args
 				inf.local(specialized->flow());
+				auto flow = specialized->flow()->flow();
+				auto last = *flow.rbegin();
+				JT_COMP_ASSERT(last->term(), "Return type wasn't evaluated");
+				JT_COMP_ASSERT(!last->term().is<FuncTermImpl>(), "Return type wasn't evaluated from function");
+				specialized->set_ret(make_var(last->term()));
 			}
 		}
 		else

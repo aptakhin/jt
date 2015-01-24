@@ -24,25 +24,26 @@ std::string BaseReportFormatter::format(const Report& report, int offset, bool s
 OstreamReportOut::OstreamReportOut(std::ostream& out)
 :	out_(out) {}
 
-void OstreamReportOut::out(const Report& report) {
-	out_impl(report);
+void OstreamReportOut::out(const Report& report, int offset) {
+	out_impl(report, offset);
 }
 
-void OstreamReportOut::out_impl(const Report& report) {
-	out_ << BaseReportFormatter::format(report, offset_, false) << std::endl;
+void OstreamReportOut::out_impl(const Report& report, int offset) {
+	out_ << BaseReportFormatter::format(report, offset, false) << std::endl;
+	out_.flush();
 }
 
-void Win32DbgReportOut::out(const Report& report) {
-	out_impl(report);
+void Win32DbgReportOut::out(const Report& report, int offset) {
+	out_impl(report, offset);
 }
 
-void Win32DbgReportOut::out_impl(const Report& report) {
+void Win32DbgReportOut::out_impl(const Report& report, int) {
 	OutputDebugString((BaseReportFormatter::format(report, 0, true) + "\n").c_str());
 }
 
 void Reports::report(const Report& report) {
 	for (auto& i : report_out_)
-		i->out(report);
+		i->out(report, offset_);
 }
 
 } // namespace jt {

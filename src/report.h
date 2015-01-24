@@ -31,8 +31,25 @@ public:
 class IReportOut {
 public:
 	virtual ~IReportOut() {}
-	virtual void out(const Report& report) = 0;
+	virtual void out(const Report& report, int offset) = 0;
 };
+
+class Reports {
+public:
+	void add_out(IReportOut* out) { report_out_.push_back(out); }
+	void remove_out(IReportOut* out) { report_out_.erase(std::find(report_out_.begin(), report_out_.end(), out)); }
+	void report(const Report& report);
+
+	void push_offset(int plus_offset) { offset_ += plus_offset; } 
+
+protected:
+	std::vector<IReportOut*> report_out_;
+
+	int offset_ = 0;
+};
+
+extern Reports Rep;
+
 
 class BaseReportFormatter {
 public:
@@ -42,57 +59,40 @@ public:
 class OstreamReportOut : public IReportOut {
 public:
 	OstreamReportOut(std::ostream& out);
-	virtual void out(const Report& report) override;
-
-	void push_offset(int plus_offset) { offset_ += plus_offset; } 
+	virtual void out(const Report& report, int offset) override;
 
 protected:
-	void out_impl(const Report& report);
+	void out_impl(const Report& report, int offset);
 
 protected:
 	std::ostream& out_;
-
-	int offset_ = 0;
 };
 
 class OstreamReportOutScopeOffset {
 public:
-	OstreamReportOutScopeOffset(OstreamReportOut& out) : out_(out) {
-		out_.push_offset(1);
+	OstreamReportOutScopeOffset() {
+		Rep.push_offset(1);
 	}
 
 	~OstreamReportOutScopeOffset() {
-		out_.push_offset(-1);
+		Rep.push_offset(-1);
 	}
-
-private:
-	OstreamReportOut& out_;
 };
 
 extern OstreamReportOut RepOut; // See test.cpp for definition
 
-#define JT_TRACE_SCOPE(msg) JT_TRACE((msg)); OstreamReportOutScopeOffset JT_CONCAT(trace_scope_, __LINE__)(RepOut);
+#define JT_TRACE_SCOPE(msg) JT_TRACE((msg)); OstreamReportOutScopeOffset JT_CONCAT(trace_scope_, __LINE__);
 
 class Win32DbgReportOut : public IReportOut {
 public:
 	Win32DbgReportOut() {}
-	virtual void out(const Report& report) override;
+	virtual void out(const Report& report, int offset) override;
 
 protected:
-	void out_impl(const Report& report);
+	void out_impl(const Report& report, int offset);
 };
 
-class Reports {
-public:
-	void add_out(IReportOut* out) { report_out_.push_back(out); }
-	void report(const Report& report);
-
-protected:
-	std::vector<IReportOut*> report_out_;
-};
-
-extern Reports Rep;
-
+#define JT_TRAP(cond) { if ((cond)) { DebugBreak(); } }
 #define JT_COMP_ERR(msg) { Rep.report(Report(ReportLevel::COMP_ERR, __FILE__, __LINE__, (msg))); DebugBreak(); }
 #define JT_COMP_ASSERT(expr, msg) if (!(expr)){ JT_COMP_ERR(msg); }
 #define JT_TRACE(msg) { Rep.report(Report(ReportLevel::NOTIF, __FILE__, __LINE__, (msg))); }

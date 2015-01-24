@@ -162,18 +162,23 @@ protected:
 		Inferencer inf(*root_.get(), ctx_);
 
 		auto test_info = ::testing::UnitTest::GetInstance()->current_test_info();
-		auto name = String() + "tests/" + test_info->name() + ".txt";
+		auto name = String() + "tests-dump/" + test_info->name() + ".txt";
 
 		std::ofstream fout(name.c_str());
 		fout << parser_->str() << std::endl << std::endl;
 
-		JT_TRACE_SCOPE("Starting inferencer");
-		inf.local(run_->flow());
-
 		AstPrinter print(fout);
 		print.visit("", root_->flow());
 
+		OstreamReportOut rep_out(fout); 
+		Rep.add_out(&rep_out);
+
+		JT_TRACE_SCOPE("Starting inferencer");
+		inf.local(run_->flow());
+
 		run_->exec();
+
+		Rep.remove_out(&rep_out);
 	}
 
 	void call_print(const String& t_out) {
@@ -399,7 +404,7 @@ TEST_F(BaseTest, DefFuncI3) {
 }
 
 TEST_F(BaseTest, DefFuncI4) {
-	parser_->push("def func(a) { a * 2 + 1; } x = 1 + func(31);");
+	parser_->push("def func(a) { a + 1; } x = 1 + func(31);");
 	call_print("x");
 	TEST_OUT("64");
 }

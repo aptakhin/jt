@@ -1,5 +1,6 @@
 
 #include "runner.h"
+#include "inferencer.h"
 
 namespace jt {
 
@@ -26,8 +27,9 @@ Term Context::find_named(const String& name, Seq arg_types, Context** out_parent
 Term Context::find_best(const String& name, Seq arg_types, int& best_score, Context** out_parent) {
 	Term best;
 	auto r = terms_named_.equal_range(name);
-	JT_TRACE_SCOPE("Searching");
+	JT_TRACE_SCOPE("Searching " + name);
 	for (auto i = r.first; i != r.second; ++i) {
+		JT_TRACE_SCOPE("Checking");
 		if (arg_types->empty()) {
 			JT_COMP_ASSERT(best_score != 1, "Multiply names for empty query");
 			best_score = 1;
@@ -35,7 +37,7 @@ Term Context::find_best(const String& name, Seq arg_types, int& best_score, Cont
 			return i->second;
 		}
 		if (auto is = i->second.as<FuncTermImpl>()) {
-			JT_TRACE_SCOPE("Test suits");
+			JT_TRACE_SCOPE("Test func suits");
 			auto score = suits(is->args(), arg_types);
 			if (score > best_score) {
 				best = i->second;
@@ -60,7 +62,7 @@ int Context::suits(Seq proto_types, Seq input_types) {
 	int suits_score = 0;
 	auto j = begin(input_types);
 	for (auto& i: proto_types) {
-		JT_TRACE_SCOPE("Test term type");
+		JT_TRACE_SCOPE(String() + "Test term type proto: " + type_name(i->term()) + "; input: " + type_name((*j)->term()));
 		auto input = (*j)->term()->type();
 		if (input == TermType::FUNC) {
 			auto func = (*j)->term().impl<FuncTermImpl>();
@@ -68,15 +70,18 @@ int Context::suits(Seq proto_types, Seq input_types) {
 			input = func->ret()->term()->type();
 		}
 		if (i->term()) {
-			if (i->term()->type() != input)
+			if (i->term()->type() != input) {
+				JT_TRACE("Type mismatch. Back")
 				return 0;
-			suits_score += 2;
+			}
+			suits_score += 2; // Exact match of types is preferred
 		}
 		else {
-			suits_score += 1;
+			suits_score += 1; // Match to generic type has little score
 		}
 		++j;
 	}
+	JT_TRACE("Score " + std::to_string(suits_score));
 	return suits_score;
 }
 
