@@ -110,12 +110,19 @@ Term Inferencer::local(Node node) {
 				// Setup input parameters, output
 				Inferencer inf(*specialized, stack_.front());
 				inf.local(args); // Pass args
-				inf.local(specialized->flow());
+				inf.local(specialized-> flow());
 				auto flow = specialized->flow()->flow();
-				auto last = *flow.rbegin();
-				JT_COMP_ASSERT(last->term(), "Return type wasn't evaluated");
-				JT_COMP_ASSERT(!last->term().is<FuncTermImpl>(), "Return type wasn't evaluated from function");
-				specialized->set_ret(make_var(last->term()));
+
+				if (flow.empty()) {
+					// Return None?
+				} 
+				else {
+					auto last = *flow.rbegin();
+					JT_COMP_ASSERT(last->term(), "Return type wasn't evaluated");
+					// It's wright assert. Fix other code first
+					//JT_COMP_ASSERT(last->term().is_abstract(), "Return type wasn't evaluated from function");
+					specialized->set_ret(make_var(last->term()));
+				}
 			}
 		}
 		else

@@ -13,6 +13,7 @@
 #include <type_traits>
 #include <tuple>
 #include <vector>
+#include <fstream>
 
 #define NOMINMAX
 #include <windows.h>

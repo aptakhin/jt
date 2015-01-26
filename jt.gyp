@@ -17,6 +17,8 @@
 		'src/gtest/gtest.h',
 		'src/inferencer.cpp',
 		'src/inferencer.h',
+		'src/llvm.h',
+		'src/llvm.cpp',
 		'src/lexer.h',
 		'src/lexer.rl',
 		'src/lexer_gen.cpp',
