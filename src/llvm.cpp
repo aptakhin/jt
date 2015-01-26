@@ -21,11 +21,16 @@ void Assembly::next(Node node, const String& var) {
 
 	case NodeType::VAR: {
 		auto v = node.impl<VarImpl>();
+		
 		if (v->term().is<IntTermImpl>()) {
 			*this << 
 			var + " = shl i32 " + std::to_string(v->term().as<IntTermImpl>()->number()) + ", 0";
-		} 
+		}
+		else if (v->value().is<FuncCallImpl>()) {
+			next(v->value(), var);
+		}
 		else {
+			*this << 
 			var + " = shl i32 0, 0; Unknown type";
 		}
 	}
@@ -41,7 +46,7 @@ void Assembly::next(Node node, const String& var) {
 			next(call->flow()->flow()[0], lhs);
 			next(call->flow()->flow()[1], rhs);
 			*this << 
-			"add i32 " + lhs + ", " + rhs;
+			var + " = add i32 " + lhs + ", " + rhs;
 		}
 		if (name == "print") {
 			auto eq = tmp();
