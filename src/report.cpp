@@ -3,6 +3,9 @@
 #include <string>
 #include <string.h>
 
+#define NOMINMAX
+#include <windows.h>
+
 namespace jt {
 
 Reports Rep;

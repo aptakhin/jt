@@ -50,7 +50,6 @@ protected:
 
 extern Reports Rep;
 
-
 class BaseReportFormatter {
 public:
 	static std::string format(const Report& report, int offset, bool show_file_path);
@@ -90,12 +89,13 @@ protected:
 	void out_impl(const Report& report, int offset);
 };
 
-#define JT_TRAP(cond) { if ((cond)) { DebugBreak(); } }
-#define JT_COMP_ERR(msg) { Rep.report(Report(ReportLevel::COMP_ERR, __FILE__, __LINE__, (msg))); DebugBreak(); }
+#define JT_DEBUG_BREAK { __asm { int 3 } }
+#define JT_TRAP(cond) { if ((cond)) { JT_DEBUG_BREAK; } }
+#define JT_COMP_ERR(msg) { Rep.report(Report(ReportLevel::COMP_ERR, __FILE__, __LINE__, (msg))); JT_DEBUG_BREAK; }
 #define JT_COMP_ASSERT(expr, msg) if (!(expr)){ JT_COMP_ERR(msg); }
 #define JT_TRACE(msg) { Rep.report(Report(ReportLevel::NOTIF, __FILE__, __LINE__, (msg))); }
-#define JT_USER_ERR(msg) { Rep.report(Report(ReportLevel::USER_ERR, __FILE__, __LINE__, (msg))); DebugBreak(); }
+#define JT_USER_ERR(msg) { Rep.report(Report(ReportLevel::USER_ERR, __FILE__, __LINE__, (msg))); JT_DEBUG_BREAK; }
 
-#define JT_TEST_DBG_SEEK(test, seek) { if (String(::testing::UnitTest::GetInstance()->current_test_info()->name()) == test) { static unsigned counter = (seek); --counter; if (!counter) { DebugBreak(); }  } }
+#define JT_TEST_DBG_SEEK(test, seek) { if (String(::testing::UnitTest::GetInstance()->current_test_info()->name()) == test) { static unsigned counter = (seek); --counter; if (!counter) { JT_DEBUG_BREAK; } } }
 
 } // namespace jt {
