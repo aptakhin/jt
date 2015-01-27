@@ -1,13 +1,16 @@
 import urllib2
 import sys
+import os
 from zipfile import ZipFile, BadZipfile
 
 def install():
-	print 'downloading win32 tools'
-	download_file('https://github.com/aptakhin/jt/releases/download/v0.0.0/wintools.zip', 'wintools.zip')
+	arch_file = 'wintools.zip'
+
+	print 'downloading win32 tools'	
+	download_file('https://github.com/aptakhin/jt/releases/download/v0.0.0/wintools.zip', arch_file)
 
 	try:
-		with ZipFile('wintools.zip', 'r') as tools_zip:
+		with ZipFile(arch_file, 'r') as tools_zip:
 			test = tools_zip.testzip()
 			if test:
 				print 'archive corrupted, exit'
@@ -15,6 +18,10 @@ def install():
 
 			print 'extracting'
 			tools_zip.extractall('./')
+
+		print 'removing temporary archive'
+		os.remove(arch_file) 
+
 	except BadZipfile as e:
 		print 'can\'t open zip file: corrupted or something else, exit'
 		exit()
