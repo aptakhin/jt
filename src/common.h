@@ -15,9 +15,6 @@
 #include <vector>
 #include <fstream>
 
-#define NOMINMAX
-#include <windows.h>
-
 namespace jt {
 
 typedef std::int8_t   i1;
