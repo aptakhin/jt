@@ -36,7 +36,8 @@ Install them manually on other platforms or stay tuned!
 
 Use GYP to generate project files for your favourite environment/IDE:
 
-	gyp jt.gyp --depth=proj/vs13 --generator-output=./proj/vs13 -f msvs -G msvs_version=2013
+	cd wintools
+	gyp ..\jt.gyp --depth=proj\vs13\ --generator-output=..\proj\vs13\tmp -f msvs -G msvs_version=2013
 
 	
 Regenerating lexer (Ragel) and parser (bison) files after changing grammar:	
