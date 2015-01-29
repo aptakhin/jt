@@ -51,7 +51,13 @@ int main(int argc, char** argv) {
 		interactive = true;
 
 	if (interactive) {
-		Interactive inter(std::cin);
+		Interactive inter(std::cin, true);
+		return inter.exec();
+	}
+
+	if (!source.empty()) {
+		auto in = std::ifstream(source.c_str());
+		Interactive inter(in, false);
 		return inter.exec();
 	}
 

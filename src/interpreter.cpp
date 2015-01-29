@@ -119,16 +119,22 @@ void BaseTest::call_print(const String& t_out) {
 	run_->flow()->add(print);
 }
 
-Interactive::Interactive(std::istream& in) 
-:	in_(in) {
+Interactive::Interactive(std::istream& in, bool repl) 
+:	in_(in),
+	repl_(repl) {
 	setup_env();
 }
 
 int Interactive::exec() {
+	return repl_? exec_interactive() : exec_stream();
+}
+
+int Interactive::exec_interactive() {
 	size_t cur_exec = 0;
 	String line;
 	String prev_print;
-	while (in_) {
+
+	while (!in_.eof()) {
 		std::getline(in_, line);
 		parser_->push(line + "\n");
 
@@ -154,6 +160,25 @@ int Interactive::exec() {
 		}
 		out_.str(std::string());
 	}
+	
+	return 0;
+}
+
+int Interactive::exec_stream() {
+	size_t cur_exec = 0;
+	String line;
+	String prev_print;
+
+	while (!in_.eof()) {
+		std::getline(in_, line);
+		parser_->push(line + "\n");
+	}
+
+	Inferencer inf(*root_.get(), ctx_);
+	inf.local(run_->flow());
+
+	run_->exec();
+	std::cout << out_.str() << std::endl;
 	
 	return 0;
 }

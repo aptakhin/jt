@@ -95,12 +95,18 @@ protected:
 
 class Interactive : private BaseEnv {
 public:
-	Interactive(std::istream& in);
+	Interactive(std::istream& in, bool repl);
 
 	int exec();
 
 protected:
+	int exec_interactive();
+	int exec_stream();
+
+protected:
 	std::istream& in_;
+
+	bool repl_;
 };
 
 } // namespace jt {
