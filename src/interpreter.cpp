@@ -127,6 +127,7 @@ Interactive::Interactive(std::istream& in)
 int Interactive::exec() {
 	size_t cur_exec = 0;
 	String line;
+	String prev_print;
 	while (in_) {
 		std::getline(in_, line);
 		parser_->push(line + "\n");
@@ -134,16 +135,24 @@ int Interactive::exec() {
 		Inferencer inf(*root_.get(), ctx_);
 		inf.local(run_->flow());
 		size_t commands = run_->flow()->flow().size();
-		if (cur_exec < commands) {
-			auto term = run_->exec_node(run_->flow()->flow()[cur_exec]);
-			auto print = FuncCall("print", make_var(term));
-			auto print_term = inf.local(print);
-			print->set_term(print_term);
-			run_->exec_node(print);
+
+		size_t to_eval = cur_exec;
+		if (cur_exec >= commands)
+			to_eval = commands - 1;
+		
+		auto term = run_->exec_node(run_->flow()->flow()[to_eval]);
+		auto print = FuncCall("print", make_var(term));
+		auto print_term = inf.local(print);
+		print->set_term(print_term);
+		run_->exec_node(print);
+		if (cur_exec < commands || out_.str() != prev_print) {
 			std::cout << "> " << out_.str() << std::endl;
-			out_.str(std::string());
-			++cur_exec;
+			prev_print = out_.str();
+
+			if (cur_exec < commands)
+				++cur_exec;
 		}
+		out_.str(std::string());
 	}
 	
 	return 0;
