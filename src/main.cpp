@@ -23,6 +23,7 @@ int main(int argc, char** argv) {
 	String source;
 	bool run_internal_tests = false;
 	bool interactive = false;
+	bool stream = false;
 
 #ifdef _WIN32
 	Win32DbgReportOut win32trace;
@@ -34,6 +35,9 @@ int main(int argc, char** argv) {
 	for (size_t i = 1; i < argc; ++i) {
 		if (strcmp(argv[i], "--run_internal_tests") == 0)
 			run_internal_tests = true;
+		else 
+		if (strcmp(argv[i], "-s") == 0)
+			stream = true;
 		else 
 		if (i == argc - 1)
 			source = argv[i];
@@ -51,7 +55,7 @@ int main(int argc, char** argv) {
 		interactive = true;
 
 	if (interactive) {
-		Interactive inter(std::cin, true);
+		Interactive inter(std::cin, stream? false : true);
 		return inter.exec();
 	}
 
