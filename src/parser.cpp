@@ -21,12 +21,13 @@ void Parser::push(const String& c) {
 	str_ += c;
 
 	Lexer lexer(c.c_str(), c.c_str() + c.size());
-	int status;
+	int status = YYPUSH_MORE;
 
 	do {
 		YYSTYPE yylval;
 		memset(&yylval, 0, sizeof(yylval));
-		tokens_.push_back(Token());
+		if (tokens_.empty() || !tokens_.empty() && tokens_.back().lex != UNKNOWN)
+			tokens_.push_back(Token());
 		Token& tok = tokens_.back();
 		lexer.next_lexeme(&tok);
 
