@@ -15,13 +15,14 @@ public:
 	void push(Node node);
 
 private:
-	void next(Node node, const String& var);
+	void next(Node node, String& out);
 
 	void g(const String& str);
 
 	Assembly& operator << (const String& str);
 
 	String tmp();
+	String var(const String& name);
 
 private:
 	std::ofstream out_;

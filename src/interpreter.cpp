@@ -2,6 +2,10 @@
 #include "interpreter.h"
 #include <gtest/gtest.h>
 
+#if JT_PLATFORM == JT_PLATFORM_WIN32
+#	include <windows.h>
+#endif
+
 namespace jt {
 
 std::vector<Node> listed(std::initializer_list<Node>&& init) {
@@ -126,10 +130,8 @@ Interactive::Interactive(std::istream& in)
 }
 
 int Interactive::exec(bool repl, const String& assembly) {
-	
-	if (!in_.good()) {
+	if (!in_.good())
 		return 0;
-	}
 
 	int result =  repl? exec_interactive() : exec_stream();
 
@@ -175,10 +177,6 @@ int Interactive::exec_interactive() {
 	return 0;
 }
 
-#if JT_PLATFORM == JT_PLATFORM_WIN32
-#	include <windows.h>
-#endif
-
 int Interactive::exec_stream() {
 	String line;
 
@@ -187,11 +185,11 @@ int Interactive::exec_stream() {
 		parser_->push(line + "\n");
 	}
 
-	#if JT_PLATFORM == JT_PLATFORM_WIN32
-	if (IsDebuggerPresent()) {
-		JT_DBG_BREAK;
-	}
-	#endif
+	//#if JT_PLATFORM == JT_PLATFORM_WIN32
+	//if (IsDebuggerPresent()) {
+	//	JT_DBG_BREAK;
+	//}
+	//#endif // #if JT_PLATFORM == JT_PLATFORM_WIN32
 
 	Inferencer inf(*root_.get(), ctx_);
 	inf.local(run_->flow());

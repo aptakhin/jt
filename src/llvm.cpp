@@ -9,36 +9,37 @@ void Assembly::open(const String& filename) {
 	out_.open(filename.c_str());
 }
 
-void Assembly::next(Node node, const String& var) {
+void Assembly::next(Node node, String& out) {
 	switch (node.type()) {
 	case NodeType::FLOW: {
 		auto flow = node.impl<FlowImpl>();
 		for (auto& i: flow->flow()) {
-			next(i, tmp());
+			String tmp;
+			next(i, tmp);
 		}
 	}
 	break;
 
 	case NodeType::VAR: {
 		auto v = node.impl<VarImpl>();
+		out = var(v->name());
 		
 		if (v->term().is<IntTermImpl>()) {
 			*this << 
-			var + " = shl i32 " + std::to_string(v->term().as<IntTermImpl>()->number()) + ", 0";
+			out + " = shl i32 " + std::to_string(v->term().as<IntTermImpl>()->number()) + ", 0";
 		}
 		else if (v->value().is<FuncCallImpl>()) {
-			next(v->value(), var);
+			next(v->value(), out);
 		}
 		else {
 			*this << 
-			var + " = shl i32 0, 0; Unknown type";
+			out + " = shl i32 0, 0; Unknown type";
 		}
 	}
 	break;
 
 	case NodeType::FUNC_CALL: {
 		auto call = node.impl<FuncCallImpl>();
-
 		auto name = call->name();
 
 		if (name == "op_plus") {
@@ -46,13 +47,18 @@ void Assembly::next(Node node, const String& var) {
 			next(call->flow()->flow()[0], lhs);
 			next(call->flow()->flow()[1], rhs);
 			*this << 
-			var + " = add i32 " + lhs + ", " + rhs;
+			out + " = add i32 " + lhs + ", " + rhs;
 		}
 		if (name == "print") {
-			auto eq = tmp();
-			next(call->flow()->flow()[0], eq);
+			auto out = tmp();
+			next(call->flow()->flow()[0], out);
 			*this << 
-			tmp() + " = call i32 @print_i(i32 " + eq + ")";
+			tmp() + " = call i32 @print_i(i32 " + out + ")";
+		}
+		if (name == "op_get") {
+			auto name = call->flow()->flow()[0];
+			auto name_val = name->term().as<StringTermImpl>();
+			out = var(name_val->str());
 		}
 	}
 	}
@@ -77,7 +83,8 @@ void Assembly::push(Node node) {
 
 	auto flow = node.impl<FlowImpl>();
 	for (auto& i: flow->flow()) {
-		next(i, tmp());
+		String tmp;
+		next(i, tmp);
 	}
 
 	*this << 
@@ -92,6 +99,15 @@ Assembly& Assembly::operator << (const String& str) {
 
 String Assembly::tmp() {
 	return "%tmp" + std::to_string(counter_++);
+}
+
+String Assembly::var(const String& name) {
+	if (name.empty())
+		return tmp();
+	if (name[0] == 't')
+		return "%_" + name;
+	else
+		return "%" + name;
 }
 
 } // namespace jt {
