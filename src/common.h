@@ -37,6 +37,9 @@ typedef std::string String;
 #define JT_CONCAT_IMPL(a, b) a##b
 #define JT_CONCAT(a, b) JT_CONCAT_IMPL(a, b)
 
+const int JT_PLATFORM_WIN32 = 32;
+#define JT_PLATFORM JT_PLATFORM_WIN32
+
 template <class T>
 class TypeStorage {
 public:

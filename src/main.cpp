@@ -14,7 +14,7 @@ using namespace jt;
 void help() {
 	std::cout << "jt compiler/interpreter" << std::endl;
 	std::cout << "Usage: " << std::endl;
-	std::cout << "  jt [target]" << std::endl;
+	std::cout << "  jt [source]" << std::endl;
 	std::cout << "Optional flags" << std::endl;
 	std::cout << "  --run_internal_tests Run internal bundled tests and exit" << std::endl;
 }
@@ -24,8 +24,9 @@ int main(int argc, char** argv) {
 	bool run_internal_tests = false;
 	bool interactive = false;
 	bool stream = false;
+	String gen_llvm;
 
-#ifdef _WIN32
+#if JT_PLATFORM == JT_PLATFORM_WIN32
 	Win32DbgReportOut win32trace;
 	Rep.add_out(&win32trace);
 #endif
@@ -38,6 +39,9 @@ int main(int argc, char** argv) {
 		else 
 		if (strcmp(argv[i], "-s") == 0)
 			stream = true;
+		else 
+		if (strcmp(argv[i], "--gen_llvm") == 0)
+			gen_llvm = argv[++i];
 		else 
 		if (i == argc - 1)
 			source = argv[i];
@@ -55,14 +59,14 @@ int main(int argc, char** argv) {
 		interactive = true;
 
 	if (interactive) {
-		Interactive inter(std::cin, stream? false : true);
-		return inter.exec();
+		Interactive inter(std::cin);
+		return inter.exec(stream? false : true, gen_llvm);
 	}
 
 	if (!source.empty()) {
 		auto in = std::ifstream(source.c_str());
-		Interactive inter(in, false);
-		return inter.exec();
+		Interactive inter(in);
+		return inter.exec(false, gen_llvm);
 	}
 
 	return 0;

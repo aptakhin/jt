@@ -36,7 +36,7 @@ void OstreamReportOut::out_impl(const Report& report, int offset) {
 	out_.flush();
 }
 
-#ifdef _WIN32
+#if JT_PLATFORM == JT_PLATFORM_WIN32
 void Win32DbgReportOut::out(const Report& report, int offset) {
 	out_impl(report, offset);
 }
@@ -44,7 +44,7 @@ void Win32DbgReportOut::out(const Report& report, int offset) {
 void Win32DbgReportOut::out_impl(const Report& report, int) {
 	OutputDebugString((BaseReportFormatter::format(report, 0, true) + "\n").c_str());
 }
-#endif // #ifdef _WIN32
+#endif // #if JT_PLATFORM == JT_PLATFORM_WIN32
 
 void Reports::report(const Report& report) {
 	for (auto& i : report_out_)

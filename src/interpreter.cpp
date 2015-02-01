@@ -105,6 +105,7 @@ void BaseTest::exec() {
 
 	JT_TRACE_SCOPE("Starting inferencer");
 	inf.local(run_->flow());
+
 	assembly_.open(String() + "assembly/" + test_info->name() + ".as");
 	assembly_.push(root_->flow());
 
@@ -119,14 +120,24 @@ void BaseTest::call_print(const String& t_out) {
 	run_->flow()->add(print);
 }
 
-Interactive::Interactive(std::istream& in, bool repl) 
-:	in_(in),
-	repl_(repl) {
+Interactive::Interactive(std::istream& in) 
+:	in_(in) {
 	setup_env();
 }
 
-int Interactive::exec() {
-	return repl_? exec_interactive() : exec_stream();
+int Interactive::exec(bool repl, const String& assembly) {
+	
+	if (!in_.good()) {
+		return 0;
+	}
+
+	int result =  repl? exec_interactive() : exec_stream();
+
+	if (!assembly.empty()) {
+		assembly_.open(assembly);
+		assembly_.push(root_->flow());
+	}
+	return result;
 }
 
 int Interactive::exec_interactive() {
@@ -164,15 +175,23 @@ int Interactive::exec_interactive() {
 	return 0;
 }
 
+#if JT_PLATFORM == JT_PLATFORM_WIN32
+#	include <windows.h>
+#endif
+
 int Interactive::exec_stream() {
-	size_t cur_exec = 0;
 	String line;
-	String prev_print;
 
 	while (!in_.eof()) {
 		std::getline(in_, line);
 		parser_->push(line + "\n");
 	}
+
+	#if JT_PLATFORM == JT_PLATFORM_WIN32
+	if (IsDebuggerPresent()) {
+		JT_DBG_BREAK;
+	}
+	#endif
 
 	Inferencer inf(*root_.get(), ctx_);
 	inf.local(run_->flow());

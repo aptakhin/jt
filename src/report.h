@@ -80,7 +80,7 @@ public:
 
 #define JT_TRACE_SCOPE(msg) JT_TRACE((msg)); OstreamReportOutScopeOffset JT_CONCAT(trace_scope_, __LINE__);
 
-#ifdef _WIN32
+#if JT_PLATFORM == JT_PLATFORM_WIN32
 
 class Win32DbgReportOut : public IReportOut {
 public:
@@ -91,7 +91,7 @@ protected:
 	void out_impl(const Report& report, int offset);
 };
 
-#endif // #ifdef _WIN32
+#endif // #if JT_PLATFORM == JT_PLATFORM_WIN32
 
 #define JT_DBG_BREAK { __asm { int 3 } }
 #define JT_TRAP(cond) { if ((cond)) { JT_DEBUG_BREAK; } }
