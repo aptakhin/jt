@@ -20,7 +20,7 @@ Parser::~Parser() {
 void Parser::push(const String& c) {
 	str_ += c;
 
-	Lexer lexer(c.c_str(), c.c_str() + c.size());
+	Lexer lexer(c.c_str(), c.c_str() + c.size(), line_, col_);
 	int status = YYPUSH_MORE;
 
 	do {
@@ -31,9 +31,17 @@ void Parser::push(const String& c) {
 		Token& tok = tokens_.back();
 		lexer.next_lexeme(&tok);
 
+		line_ = lexer.line();
+		col_ = lexer.col();
+
 		if (tok.lex == UNKNOWN)
 			break;
-		if (tok.lex == SPACE || tok.lex == NEW_LINE)
+		if (tok.lex == NEW_LINE) {
+			line_ += 1; // TODO: More parser checks 
+			col_ = 1;
+			continue;
+		}
+		if (tok.lex == SPACE)
 			continue; // TODO: More parser checks 
 		int lexx = tok.lex;
 		if (lexx == NUMBER)

@@ -17,7 +17,7 @@ number = (intlit);
 	
 newline = ('\n');
 
-ws = ([ \t])+;
+ws = [ \t];
 	
 main := |*
 
@@ -70,12 +70,14 @@ main := |*
 
 }%%
 
-Lexer::Lexer(const char* p_, const char* pe_)
+Lexer::Lexer(const char* p_, const char* pe_, int line, int col)
 :	p(p_),
 	pe(pe_),
 	eof(pe_),
 	orig_(p_),
-	line_beg_(orig_) {
+	line_beg_(orig_),
+	line_(line),
+	col_(col) {
 	%% write init;
 }
 
@@ -84,7 +86,7 @@ void Lexer::next_lexeme(Token* tok) {
 	offset_ = p - orig_;
 	tok->line = line_;
 	tok->col  = col_;
-	col_ = p - line_beg_;
+	col_ = p - line_beg_ + 1;
 }
 
 } // namespace jt {

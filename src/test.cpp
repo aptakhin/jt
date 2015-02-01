@@ -85,7 +85,7 @@ TEST_F(BaseTest, SimpleIf2) {
 
 TEST(Common, Lexer) {
 	char w[] = "def func()\n { x = 5; }";
-	Lexer lexer(w, w + sizeof(w));
+	Lexer lexer(w, w + sizeof(w), 1, 1);
 
 	while (true) {
 		Token tok;

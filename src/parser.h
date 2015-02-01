@@ -29,6 +29,8 @@ protected:
 	String str_;
 
 	std::list<Token> tokens_;
+
+	int line_ = 1, col_ = 1;
 };
 
 } // namespace jt {

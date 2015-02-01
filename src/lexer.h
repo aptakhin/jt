@@ -19,9 +19,12 @@ struct Token {
 
 class Lexer {
 public:
-	Lexer(const char* start, const char* end);
+	Lexer(const char* start, const char* end, int line, int col);
 
 	void next_lexeme(Token* tok);
+
+	int line() const { return line_; }
+	int col() const { return col_; }
 
 private:
 	char const* p;
@@ -34,7 +37,7 @@ private:
 	int act;
 
 	const char* orig_;
-	int line_ = 0, col_ = 0;
+	int line_, col_;
 	int offset_ = 0;
 	const char* line_beg_;
 };
