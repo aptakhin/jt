@@ -49,12 +49,14 @@ void Assembly::next(Node node, String& out) {
 			*this << 
 			out + " = add i32 " + lhs + ", " + rhs;
 		}
+		else 
 		if (name == "print") {
 			auto out = tmp();
 			next(call->flow()->flow()[0], out);
 			*this << 
 			tmp() + " = call i32 @print_i(i32 " + out + ")";
 		}
+		else 
 		if (name == "op_get") {
 			auto name = call->flow()->flow()[0];
 			auto name_val = name->term().as<StringTermImpl>();
