@@ -29,6 +29,8 @@
 		'src/parser.y',
 		'src/parser_gen.cpp',
 		'src/parser_gen.hpp',
+		'src/python-bind.h',
+		'src/python-bind.cpp',
 		'src/report.cpp',
 		'src/report.h',
 		'src/runner.cpp',

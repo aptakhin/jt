@@ -6,6 +6,7 @@
 #include "inferencer.h"
 #include "interpreter.h"
 #include "llvm.h"
+#include "python-bind.h"
 #include <fstream>
 #include <gtest/gtest.h>
 
@@ -31,6 +32,8 @@ int main(int argc, char** argv) {
 	Rep.add_out(&win32trace);
 #endif
 
+	call_python();
+
 	//help();
 
 	for (size_t i = 1; i < argc; ++i) {
@@ -52,7 +55,7 @@ int main(int argc, char** argv) {
 		int result = RUN_ALL_TESTS();
 		if (result != 0)
 			JT_DBG_BREAK;
-		return result;
+		//return result;
 	}
 
 	if (source.empty())
