@@ -10,10 +10,12 @@ Calculating `а` type when use ```double```:
 
 	x = double(3);
 	> 6
-	y = double("ab"); # Stil doesn't work, shame on me
-	> "abab"
+	y = double("ab"); # Still doesn't work, shame on me
+	> abab
 
-Also, imagine the great power of 4 basis types: integer, asci string, boolean and function!
+Imagine the great power of 4 basis types: integer, asci string, boolean and function!
+
+Developed memory model is brain exploder, so you won't see it here!
 
 ## Compilation and other humdrum
 
@@ -27,12 +29,12 @@ Call ```install.py``` to download prepared tool's binaries on Windows:
 
 - GYP
 - Ragel
-- Bison
+- Bison (near 2.4.* version, not 3+)
 - LLVM assembler and interpreter
 
 Install them manually on other platforms or stay tuned!
 
-### Hints ()
+### Hints
 
 It's Windows-only yet, but you can still use it as hint.
 
