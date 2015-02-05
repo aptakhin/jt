@@ -1,6 +1,7 @@
 
 #include "runner.h"
 #include "inferencer.h"
+#include "python-bind.h"
 
 namespace jt {
 
@@ -219,6 +220,15 @@ Term CallUnit::exec_node(Node node) {
 
 	case NodeType::NATIVE_FUNC_CALL: {
 		auto call = node.impl<NativeFuncCallImpl>();
+		auto push_args = bind(call->args());
+		auto ret = call->do_call(this, &func_, push_args);
+		if (ret->term())
+			tm = ret->term();
+	}
+		break;
+
+	case NodeType::PYTHON_FUNC_CALL: {
+		auto call = node.impl<PythonFuncCallImpl>();
 		auto push_args = bind(call->args());
 		auto ret = call->do_call(this, &func_, push_args);
 		if (ret->term())

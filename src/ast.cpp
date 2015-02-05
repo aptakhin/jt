@@ -2,6 +2,8 @@
 //
 #include "ast.h"
 
+#include "Python.h"
+
 namespace jt {
 
 NodeType Node::type() const {
@@ -156,6 +158,13 @@ void VarImpl::do_visit(IVisitor* vis) const {
 		vis->visit_term("Value", term());
 	else if (value())
 		vis->visit("Value", value());
+}
+
+Var func_simple_seq(void* func, CallUnit* unit, FuncTermImpl* parent, Seq args) {
+	JT_COMP_ASSERT(args->vars().size() == 2, "Must set only 2 arguments");
+	typedef Var(*NativeFunc) (CallUnit*, FuncTermImpl*, Seq);
+	NativeFunc native_func = (NativeFunc) func;
+	return native_func(unit, parent, args);
 }
 
 FuncCallImpl* FuncCallImpl::do_clone() const {

@@ -13,6 +13,24 @@ T& ref_cast(Term t) {
 	return *((T*) t.impl<IntTermImpl>()->number());
 }
 
+Term py_func(const String& module, const String& func, Seq args, Term ret_type) {
+	auto func_impl = new FuncTermImpl;
+	{ // Filling arguments for function
+		func_impl->set_args(args);
+		func_impl->set_ret(make_var(ret_type));
+	}
+
+	{ // Filling native call
+		auto ncall = PythonFuncCall{module, func, ret_type};
+		ncall->set_args(args);
+		func_impl->set_flow(listed({ncall}));
+	}
+
+	Term ret = make_term_move_ptr(func_impl);
+	ret.set_abstract(false);
+	return ret;
+}
+
 Var make_var_none() {
 	return Var();
 }
@@ -77,6 +95,9 @@ void BaseEnv::setup_std(ContextSPtr ctx) {
 	ctx->add_named("op_plus", def_func<IntTermImpl>(jt_pluss,  "a", "b"));
 	ctx->add_named("op_mul",  def_func<IntTermImpl>(jt_mul,    "a", "b"));
 	ctx->add_named("op_eq",   def_func<BoolTermImpl>(jt_eq,    "a", "b"));
+	Seq args;
+	args->add(make_ivar(0));
+	ctx->add_named("py_abs", py_func("builtins", "abs", args, make_term<IntTermImpl>()));
 }
 
 void BaseTest::SetUp() {
@@ -128,7 +149,6 @@ Interactive::Interactive(std::istream& in)
 int Interactive::exec(bool repl, const String& assembly) {
 	if (!in_.good())
 		return 0;
-
 	int result =  repl? exec_interactive() : exec_stream();
 
 	if (!assembly.empty()) {

@@ -7,7 +7,7 @@
 #include "lexer.h"
 #include "ast-builder.h"
 #include "inferencer.h"
-#include "interpreter.h"
+#include "python-bind.h"
 #include "llvm.h"
 #include <gtest/gtest.h>
 
@@ -64,6 +64,8 @@ Term def_func(Var(*func)(CallUnit*, FuncTermImpl*, A1*, A2*), const String& a1na
 	ret.set_abstract(false);
 	return ret;
 }
+
+Term py_func(const String& module, const String& func, Seq args, Term ret_type);
 
 class BaseEnv {
 public:

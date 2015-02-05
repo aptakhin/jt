@@ -32,8 +32,6 @@ int main(int argc, char** argv) {
 	Rep.add_out(&win32trace);
 #endif
 
-	call_python();
-
 	//help();
 
 	for (size_t i = 1; i < argc; ++i) {
@@ -49,6 +47,7 @@ int main(int argc, char** argv) {
 		if (i == argc - 1)
 			source = argv[i];
 	}
+	PyEnv env;
 
 	if (run_internal_tests) {
 		testing::InitGoogleTest(&argc, argv);

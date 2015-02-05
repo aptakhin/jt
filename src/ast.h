@@ -26,6 +26,7 @@ enum class NodeType {
 	FUNC,
 	FUNC_CALL,
 	NATIVE_FUNC_CALL,
+	PYTHON_FUNC_CALL,
 	IF,
 };
 
@@ -38,6 +39,7 @@ static const char* NodeTypeNames[] = {
 	"Func",
 	"FuncCall",
 	"NativeFuncCall",
+	"PythonFuncCall",
 	"If"
 };
 
@@ -517,12 +519,16 @@ public:
 	:	call_(nullptr), native_func_(nullptr) {}
 
 	template <typename A1>
+	NativeCall(Var (*native_func)(CallUnit*, FuncTermImpl*, Seq))
+	:	call_(&func_simple_seq), native_func_(Store(native_func)) {}
+
+	template <typename A1>
 	NativeCall(Var (*native_func)(CallUnit*, FuncTermImpl*, A1*))
-	:	call_(&func_map_seq<A1>), native_func_((Store) native_func) {}
+	:	call_(&func_map_seq<A1>), native_func_(Store(native_func)) {}
 
 	template <typename A1, typename A2>
 	NativeCall(Var (*native_func)(CallUnit*, FuncTermImpl*, A1*, A2*))
-	:	call_(&func_map_seq<A1, A2>), native_func_((Store) native_func) {}
+	:	call_(&func_map_seq<A1, A2>), native_func_(Store(native_func)) {}
 
 	Var call(CallUnit* unit, FuncTermImpl* parent_func, Seq args) {
 		return call_(native_func_, unit, parent_func, args);

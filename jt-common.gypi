@@ -2,7 +2,7 @@
 'target_defaults': {
 	'default_configuration': 'Release',
 	"include_dirs": [
-		"include", "C:/Python34/include"
+		"include", "C:/Users/Alex/Assembling/Python-3.4.2/Include"
 	],
 	"link_settings": {
 		"libraries": [
