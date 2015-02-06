@@ -11,7 +11,8 @@ namespace jt {
 enum class ReportLevel {
 	NOTIF = 1,
 	USER_ERR = 1 << 1,
-	COMP_ERR = 1 << 2
+	AST_NOTIF = 1 << 2,
+	COMP_ERR = 1 << 3,
 };
 
 class Report {
@@ -99,6 +100,7 @@ protected:
 #define JT_COMP_ASSERT(expr, msg) if (!(expr)){ JT_COMP_ERR(msg); }
 #define JT_TRACE(msg) { Rep.report(Report(ReportLevel::NOTIF, __FILE__, __LINE__, (msg))); }
 #define JT_USER_ERR(msg) { Rep.report(Report(ReportLevel::USER_ERR, __FILE__, __LINE__, (msg))); JT_DBG_BREAK; }
+#define JT_TR(msg, level) { jt::Rep.report(jt::Report(jt::ReportLevel::level, __FILE__, __LINE__, (msg))); }
 
 #define JT_DBG_TEST_SEEK(test, seek) { if (String(::testing::UnitTest::GetInstance()->current_test_info()->name()) == test) { static unsigned counter = (seek); --counter; if (!counter) { JT_DBG_BREAK; } } }
 

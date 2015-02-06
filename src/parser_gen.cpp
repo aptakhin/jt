@@ -1481,7 +1481,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 73 "../src/parser.y"
     { 
-		printf("Next Expr\n");
+		JT_TR("Next Expr", AST_NOTIF);
 	;}
     break;
 
@@ -1490,7 +1490,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 78 "../src/parser.y"
     {
-		printf("Par %s\n", (yyvsp[(1) - (1)].str));
+		JT_TR(jt::String() + "Par " + (yyvsp[(1) - (1)].str), AST_NOTIF);
 		ctx->func_def_param((yyvsp[(1) - (1)].str), "");
 	;}
     break;
@@ -1500,7 +1500,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 82 "../src/parser.y"
     {
-		printf("Par %s %s\n", (yyvsp[(1) - (2)].str), (yyvsp[(2) - (2)].str));
+		JT_TR(jt::String() + "Par " + (yyvsp[(1) - (2)].str) + " " + (yyvsp[(2) - (2)].str), AST_NOTIF);
 		ctx->func_def_param((yyvsp[(1) - (2)].str), (yyvsp[(2) - (2)].str));
 	;}
     break;
@@ -1510,7 +1510,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 88 "../src/parser.y"
     {
-		printf("Param\n"); 
+		JT_TR("Param", AST_NOTIF);
 	;}
     break;
 
@@ -1519,7 +1519,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 91 "../src/parser.y"
     {
-		printf("ParametersInt, Param\n");
+		JT_TR("ParametersInt, Param", AST_NOTIF);
 	;}
     break;
 
@@ -1528,7 +1528,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 96 "../src/parser.y"
     {
-		printf("(ParametersInt)\n"); 
+		JT_TR("(ParametersInt)", AST_NOTIF);
 	;}
     break;
 
@@ -1546,7 +1546,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 106 "../src/parser.y"
     {
-		printf("ParamExpr\n"); 
+		JT_TR("ParamExpr", AST_NOTIF);
 	;}
     break;
 
@@ -1555,7 +1555,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 109 "../src/parser.y"
     {
-		printf("ParamExprInt, ParamExpr\n");
+		JT_TR("ParamExprInt, ParamExpr", AST_NOTIF);
 	;}
     break;
 
@@ -1564,7 +1564,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 114 "../src/parser.y"
     {
-		printf("(TupleExpr)\n");
+		JT_TR("(TupleExpr)", AST_NOTIF);
 	;}
     break;
 
@@ -1573,7 +1573,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 119 "../src/parser.y"
     {
-		printf("CallFunc: Ident\n");
+		JT_TR("CallFunc: Ident", AST_NOTIF);
 		ctx->func_call((yyvsp[(1) - (1)].str));
 	;}
     break;
@@ -1583,7 +1583,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 123 "../src/parser.y"
     {
-		printf("CallFunc: (TupleExpr)\n");
+		JT_TR("CallFunc: (TupleExpr)", AST_NOTIF);
 		ctx->func_call_end();
 	;}
     break;
@@ -1593,7 +1593,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 129 "../src/parser.y"
     {
-		printf("Ident %s\n", (yyvsp[(1) - (1)].str));
+		JT_TR(jt::String() + "Ident " + (yyvsp[(1) - (1)].str), AST_NOTIF);
 		ctx->put_ident((yyvsp[(1) - (1)].str));
 	;}
     break;
@@ -1603,7 +1603,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 133 "../src/parser.y"
     {
-		printf("Number %d\n", (yyvsp[(1) - (1)].i));
+		JT_TR(jt::String() + "Number " + std::to_string((yyvsp[(1) - (1)].i)), AST_NOTIF);
 		ctx->put_var((yyvsp[(1) - (1)].i));
 	;}
     break;
@@ -1613,7 +1613,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 137 "../src/parser.y"
     {
-		printf("Str %s\n", (yyvsp[(1) - (1)].str));
+		JT_TR(jt::String() + "Str " + (yyvsp[(1) - (1)].str), AST_NOTIF);
 		ctx->put_var((yyvsp[(1) - (1)].str));
 	;}
     break;
@@ -1630,7 +1630,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 142 "../src/parser.y"
     {
-		printf("(TupleExpr)\n");
+		JT_TR("(TupleExpr)", AST_NOTIF);
 	;}
     break;
 
@@ -1646,7 +1646,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 148 "../src/parser.y"
     {
-		printf("SubExpr + AtomExpr\n");
+		JT_TR("SubExpr + AtomExpr", AST_NOTIF);
 		ctx->put_func_call_all("op_plus", 2);
 	;}
     break;
@@ -1656,7 +1656,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 152 "../src/parser.y"
     {
-		printf("SubExpr * AtomExpr\n");
+		JT_TR("SubExpr * AtomExpr", AST_NOTIF);
 		ctx->put_func_call_all("op_mul", 2);
 	;}
     break;
@@ -1666,7 +1666,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 158 "../src/parser.y"
     {
-		printf("Func %s def start;\n", (yyvsp[(2) - (2)].str));
+		JT_TR(jt::String() + "SubExpr " + (yyvsp[(2) - (2)].str) + " def start", AST_NOTIF);
 		ctx->func_def((yyvsp[(2) - (2)].str));
 	;}
     break;
@@ -1676,7 +1676,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 162 "../src/parser.y"
     { 
-		printf("Parameters\n");
+		JT_TR("Parameters", AST_NOTIF);
 		ctx->func_def_param_end();
 	;}
     break;
@@ -1686,7 +1686,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 166 "../src/parser.y"
     {
-		printf("Rettype\n");
+		JT_TR("Rettype", AST_NOTIF);
 		ctx->func_def_ret_end();
 	;}
     break;
@@ -1696,7 +1696,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 170 "../src/parser.y"
     {
-		printf("Func flow begin\n");
+		JT_TR("Func flow begin", AST_NOTIF);
 	;}
     break;
 
@@ -1705,7 +1705,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 173 "../src/parser.y"
     {
-		printf("Func flow end\n");
+		JT_TR("Func flow end", AST_NOTIF);
 	;}
     break;
 
@@ -1714,7 +1714,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 178 "../src/parser.y"
     {
-		printf("Define %s:\n", (yyvsp[(1) - (2)].str));
+		JT_TR(jt::String() + "Define " + (yyvsp[(1) - (2)].str), AST_NOTIF);
 		ctx->def((yyvsp[(1) - (2)].str));
 	;}
     break;
@@ -1740,7 +1740,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 188 "../src/parser.y"
     {
-		printf("Func def end;\n");
+		JT_TR("Func def end;", AST_NOTIF);
 		ctx->func_def_end();
 	;}
     break;
@@ -1750,7 +1750,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 192 "../src/parser.y"
     {
-		printf("SubExpr;\n");
+		JT_TR("SubExpr;", AST_NOTIF);
 	;}
     break;
 

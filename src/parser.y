@@ -71,30 +71,30 @@ typedef struct YYLTYPE
 
 Expressions:
 	| Expressions Expr { 
-		printf("Next Expr\n");
+		JT_TR("Next Expr", AST_NOTIF);
 	}
 
 Param:
 	IDENT {
-		printf("Par %s\n", $1);
+		JT_TR(jt::String() + "Par " + $1, AST_NOTIF);
 		ctx->func_def_param($1, "");
 	}
 	| IDENT IDENT {
-		printf("Par %s %s\n", $1, $2);
+		JT_TR(jt::String() + "Par " + $1 + " " + $2, AST_NOTIF);
 		ctx->func_def_param($1, $2);
 	}
 
 ParametersInt:
 	| Param {
-		printf("Param\n"); 
+		JT_TR("Param", AST_NOTIF);
 	}
 	| ParametersInt COMMA Param {
-		printf("ParametersInt, Param\n");
+		JT_TR("ParametersInt, Param", AST_NOTIF);
 	}
 
 Parameters:
 	CIRC_OPEN ParametersInt CIRC_CLOSE {
-		printf("(ParametersInt)\n"); 
+		JT_TR("(ParametersInt)", AST_NOTIF);
 	}
 
 Returned:
@@ -104,79 +104,79 @@ Returned:
 
 TupleExprInt:
 	| SubExpr {
-		printf("ParamExpr\n"); 
+		JT_TR("ParamExpr", AST_NOTIF);
 	}
 	| TupleExprInt COMMA SubExpr {
-		printf("ParamExprInt, ParamExpr\n");
+		JT_TR("ParamExprInt, ParamExpr", AST_NOTIF);
 	}
 
 TupleExpr:
 	CIRC_OPEN TupleExprInt CIRC_CLOSE {
-		printf("(TupleExpr)\n");
+		JT_TR("(TupleExpr)", AST_NOTIF);
 	}
 
 FuncCall:
 	IDENT {
-		printf("CallFunc: Ident\n");
+		JT_TR("CallFunc: Ident", AST_NOTIF);
 		ctx->func_call($1);
 	}
 	TupleExpr {
-		printf("CallFunc: (TupleExpr)\n");
+		JT_TR("CallFunc: (TupleExpr)", AST_NOTIF);
 		ctx->func_call_end();
 	}
 
 AtomExpr:
 	IDENT {
-		printf("Ident %s\n", $1);
+		JT_TR(jt::String() + "Ident " + $1, AST_NOTIF);
 		ctx->put_ident($1);
 	}
 	| NUMBER {
-		printf("Number %d\n", $1);
+		JT_TR(jt::String() + "Number " + std::to_string($1), AST_NOTIF);
 		ctx->put_var($1);
 	}
 	| STR {
-		printf("Str %s\n", $1);
+		JT_TR(jt::String() + "Str " + $1, AST_NOTIF);
 		ctx->put_var($1);
 	}
 	| FuncCall {}
 	| TupleExpr {
-		printf("(TupleExpr)\n");
+		JT_TR("(TupleExpr)", AST_NOTIF);
 	}
 
 SubExpr:
 	AtomExpr {}
 	| SubExpr PLUS SubExpr {
-		printf("SubExpr + AtomExpr\n");
+		JT_TR("SubExpr + AtomExpr", AST_NOTIF);
 		ctx->put_func_call_all("op_plus", 2);
 	}
 	| SubExpr MUL SubExpr {
-		printf("SubExpr * AtomExpr\n");
+		JT_TR("SubExpr * AtomExpr", AST_NOTIF);
 		ctx->put_func_call_all("op_mul", 2);
 	}
 
 FuncDef:
 	DEF IDENT {
-		printf("Func %s def start;\n", $2);
+		JT_TR(jt::String() + "SubExpr " + $2 + " def start", AST_NOTIF);
 		ctx->func_def($2);
 	}
 	Parameters { 
-		printf("Parameters\n");
+		JT_TR("Parameters", AST_NOTIF);
 		ctx->func_def_param_end();
 	} 
 	Returned {
-		printf("Rettype\n");
+		JT_TR("Rettype", AST_NOTIF);
 		ctx->func_def_ret_end();
 	}
 	FIG_OPEN {
-		printf("Func flow begin\n");
+		JT_TR("Func flow begin", AST_NOTIF);
 	} 
 	Expressions FIG_CLOSE {
-		printf("Func flow end\n");
+		JT_TR("Func flow end", AST_NOTIF);
 	}
 
 DefineExpr: 
 	IDENT EQUAL {
-		printf("Define %s:\n", $1);
+		JT_TR(jt::String() + "Define " + $1, AST_NOTIF);
 		ctx->def($1);
 	}
 	SubExpr {
@@ -186,11 +186,11 @@ DefineExpr:
 Expr: 
 	DefineExpr SEMICOL {}
 	| FuncDef {
-		printf("Func def end;\n");
+		JT_TR("Func def end;", AST_NOTIF);
 		ctx->func_def_end();
 	}
 	| SubExpr SEMICOL {
-		printf("SubExpr;\n");
+		JT_TR("SubExpr;", AST_NOTIF);
 	}
 %%
 
