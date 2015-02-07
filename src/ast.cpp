@@ -274,7 +274,8 @@ void AstPrinter::visit(const char* title, const Node& node) {
 	if (node.empty()) {
 		print_offset();
 		out_ << "{ EMPTY }" << std::endl;
-	} else {
+	} 
+	else {
 		print_offset();
 		out_ << title << (!title || title[0] == 0 ? "" : " ") << "{" << std::endl;
 		++offset_;
@@ -307,24 +308,6 @@ void AstPrinter::visit_term(const char* title, const Term& term) {
 			out_ << " }" << std::endl;
 		}
 	}
-}
-
-AstChecker::AstChecker() {
-	checks_.add([&](FuncTermImpl& func) {
-		checks_.call(func.flow());
-	});
-}
-
-void AstChecker::caption(const char* title) {}
-
-void AstChecker::caption(const char* title1, const char* title2) {}
-
-void AstChecker::visit(const char* title, const Node& node) {
-	checks_.call(node);
-}
-
-void AstChecker::visit_term(const char* title, const Term& term) {
-	checks_.call(term);
 }
 
 } // namespace jt {

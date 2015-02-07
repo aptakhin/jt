@@ -13,7 +13,6 @@ namespace jt {
 class Parser {
 public:
 	Parser(FuncTermImpl* root, ContextSPtr ctx);
-	~Parser();
 
 	void push(const String& c);
 	const String& str() const { return str_; }
@@ -22,7 +21,7 @@ protected:
 	FuncTermImpl* root_;
 	ContextSPtr ctx_;
 
-	yypstate* pstate_;
+	cres_ptr<yypstate> pstate_;
 
 	std::unique_ptr<ParseContext> parse_;
 

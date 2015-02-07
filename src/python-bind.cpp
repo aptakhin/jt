@@ -5,35 +5,32 @@
 
 namespace jt {
 
-PythonFuncCallImpl::PythonFuncCallImpl(const String& module_name, const String& func_name, Term ret_type)
+PythonFuncCallImpl::PythonFuncCallImpl(String module_name, String func_name, Term ret_type)
 :	NodeImpl(this),
-	func_(nullptr),
-	ret_(ret_type) {
-	auto name = PyUnicode_FromString(strdup(module_name.c_str()));
-	auto module = PyImport_Import(name);
+	module_name_(std::move(module_name)),
+	func_name_(std::move(func_name)),
+	ret_(ret_type),
+	py_func_(nullptr, [] (void* func) { Py_XDECREF(func); } ),
+	py_module_(nullptr, [] (void* module) { Py_DECREF(module); } ) {
+	auto name = PyUnicode_FromString(module_name_.c_str());
+	py_module_.reset(PyImport_Import(name));
 	Py_DECREF(name);
 
-	if (module == NULL) {
+	if (py_module_.get() == nullptr) {
 		PyErr_Print();
-		fprintf(stderr, "Failed to load \"%s\"\n", module_name.c_str());
-		//throw
+		JT_TR(String() + "Failed to load:" + module_name_, PYTHON_NOTIF);
 	}
 
-	auto func = PyObject_GetAttrString(module, strdup(func_name.c_str()));
-	//Py_DECREF(module);
+	auto func = PyObject_GetAttrString((PyObject*) py_module_.get(), func_name_.c_str());
 
 	if (!func || !PyCallable_Check(func)) {
 		if (PyErr_Occurred())
 			PyErr_Print();
-		fprintf(stderr, "Cannot find function \"%s\"\n", func_name.c_str());
+		JT_TR(String() + "Cannot find function: " + func_name_ + " in module: " + module_name_, PYTHON_NOTIF);
 		//throw
 	}
 	else
-		func_ = func;
-}
-
-PythonFuncCallImpl::~PythonFuncCallImpl() {
-	Py_XDECREF(func_);
+		py_func_.reset(func);
 }
 
 PythonFuncCallImpl* PythonFuncCallImpl::do_clone() const {
@@ -53,17 +50,16 @@ Var PythonFuncCallImpl::do_call(CallUnit* unit, FuncTermImpl* parent, Seq set_ar
 			value = PyUnicode_FromString(str->str().c_str());
 		if (!value) {
 			Py_DECREF(args);
-			fprintf(stderr, "Cannot convert argument\n");
+			JT_TR("Cannot convert argument", PYTHON_NOTIF);
 			return make_ivar(-1);
 		}
 		PyTuple_SetItem(args, i, value);
 	}
 
-	auto func = (PyObject*)func_;
-	PyObject* result = PyObject_CallObject((PyObject*)func_, args);
+	PyObject* result = PyObject_CallObject((PyObject*) py_func_.get(), args);
 	Py_DECREF(args);
 	if (result == NULL) {
-		fprintf(stderr, "Call failed\n");
+		JT_TR("Call failed", PYTHON_NOTIF);
 		return make_ivar(-1);
 	}
 

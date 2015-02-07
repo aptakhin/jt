@@ -9,10 +9,17 @@
 namespace jt {
 
 enum class ReportLevel {
-	NOTIF = 1,
-	USER_ERR = 1 << 1,
-	AST_NOTIF = 1 << 2,
-	COMP_ERR = 1 << 3,
+	NOTIF        = 1,
+	LEXER_NOTIF  = 1 << 1,
+	PARSER_NOTIF = 1 << 2,
+	SYMANT_NOTIF = 1 << 3,
+	INFERR_NOTIF = 1 << 4,
+	INTERP_NOTIF = 1 << 5,
+	GENERN_NOTIF = 1 << 6,
+	PYTHON_NOTIF = 1 << 7,
+
+	USER_ERR  = 1 << 14,
+	COMP_ERR  = 1 << 15,
 };
 
 class Report {

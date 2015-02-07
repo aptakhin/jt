@@ -13,9 +13,7 @@ public:
 
 	PythonFuncCallImpl() : NodeImpl(this) {}
 
-	PythonFuncCallImpl(const String& module, const String& name, Term ret_type);
-
-	~PythonFuncCallImpl();
+	PythonFuncCallImpl(String module_name, String func_name, Term ret_type);
 
 	virtual PythonFuncCallImpl* do_clone() const override;
 
@@ -27,8 +25,11 @@ public:
 	virtual void do_visit(IVisitor* visitor) const override;
 
 protected:
+	String module_name_;
+	String func_name_;
 	Seq args_;
-	void* func_;
+	cres_ptr<void> py_func_;
+	cres_ptr<void> py_module_;
 	Term ret_;
 };
 

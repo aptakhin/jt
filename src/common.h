@@ -32,6 +32,9 @@ typedef double   r8;
 
 typedef std::string String;
 
+template<typename T>
+using cres_ptr = std::unique_ptr<T, std::function<void (T*)>>;
+
 #define assert(Expr) { if (!(Expr)) { _CrtDbgBreak(); } }
 
 #define JT_CONCAT_IMPL(a, b) a##b

@@ -26,7 +26,7 @@ enum class NodeType {
 	FUNC,
 	FUNC_CALL,
 	NATIVE_FUNC_CALL,
-	PYTHON_FUNC_CALL,
+	PYTHON_FUNC_CALL, // \sa definition python-bind.h
 	IF,
 };
 
@@ -587,7 +587,6 @@ private:
 	Seq  args_;
 	Flow flow_;
 	Var  ret_;
-
 	Seq  init_args_;
 };
 
@@ -634,31 +633,6 @@ protected:
 	std::ostream& out_;
 
 	int offset_;
-};
-
-class AstNodeCalls {
-public:
-	template <class N>
-	void add(N node) {}
-
-	template <class N>
-	void call(N node) {}
-
-private:
-	//std::vector<>
-};
-
-class AstChecker : public IVisitor {
-public:
-	AstChecker();
-
-	virtual void caption(const char* title) override;
-	virtual void caption(const char* title1, const char* title2) override;
-	virtual void visit(const char* title, const Node& node) override;
-	virtual void visit_term(const char* title, const Term& term) override;
-
-protected:
-	AstNodeCalls checks_;
 };
 
 } // namespace jt {

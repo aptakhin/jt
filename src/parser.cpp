@@ -7,14 +7,10 @@ namespace jt {
 Parser::Parser(FuncTermImpl* root, ContextSPtr ctx)
 :	root_(root),
 	ctx_(ctx),
-	pstate_(yypstate_new()) {
+	pstate_(yypstate_new(), [](yypstate* state) { yypstate_delete(state); }) {
 	parse_ = std::make_unique<ParseContext>();
 	parse_->root = root_;
 	parse_->ctx  = ctx_;
-}
-
-Parser::~Parser() {
-	yypstate_delete(pstate_);
 }
 
 void Parser::push(const String& c) {
@@ -48,7 +44,7 @@ void Parser::push(const String& c) {
 			yylval.i = tok.i;
 		if (!tok.ident.empty())
 			yylval.str = (char*) tok.ident.c_str();
-		status = yypush_parse(pstate_, lexx, &yylval, parse_.get());
+		status = yypush_parse(pstate_.get(), lexx, &yylval, parse_.get());
 	} while (status == YYPUSH_MORE);
 	parse_->finish();
 }
