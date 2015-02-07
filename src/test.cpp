@@ -95,6 +95,46 @@ TEST(Common, Lexer) {
 	}
 }
 
+TEST_F(LexerTest, Numbers) {
+	test(
+		"x0z = 5;" 
+		"x = 1 + 2;",
+		{IDENT, EQUAL, NUMBER, SEMICOL, 
+		IDENT, EQUAL, NUMBER, PLUS, NUMBER, SEMICOL}
+	);
+}
+
+TEST_F(LexerTest, DISABLED_NumbersExps) {
+	test(
+		"x = 1 + -2;",
+		{IDENT, EQUAL, NUMBER, PLUS, NUMBER, SEMICOL}
+	);
+}
+
+TEST_F(LexerTest, SimpleFunc) {
+	test(
+		"def func() {" 
+		"  x = 5;" 
+		"}",
+		{DEF, IDENT, CIRC_OPEN, CIRC_CLOSE, FIG_OPEN, 
+		IDENT, EQUAL, NUMBER, SEMICOL, 
+		FIG_CLOSE}
+	);
+}
+
+TEST_F(LexerTest, FuncInFunc) {
+	test(
+		"def func() {"
+		"  def other(name int) int { name; }"
+		"  x = 5;" 
+		"}",
+		{DEF, IDENT, CIRC_OPEN, CIRC_CLOSE, FIG_OPEN, 
+		DEF, IDENT, CIRC_OPEN, IDENT, IDENT, CIRC_CLOSE, IDENT, FIG_OPEN, IDENT, SEMICOL, FIG_CLOSE, 
+		IDENT, EQUAL, NUMBER, SEMICOL, 
+		FIG_CLOSE}
+	);
+}
+
 #include "parser.h"
 
 TEST_F(BaseTest, Parser41) {

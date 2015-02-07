@@ -26,6 +26,8 @@ public:
 	int line() const { return line_; }
 	int col() const { return col_; }
 
+	bool finished() const;
+
 private:
 	char const* p;
 

@@ -84,6 +84,15 @@ public:
 	Assembly assembly_;
 };
 
+class LexerTest : public ::testing::Test {
+protected:
+	void SetUp() override;
+
+	void TearDown() override;
+
+	void test(const char* str, std::vector<Lexeme> lexems);
+};
+
 class BaseTest : public ::testing::Test, public BaseEnv {
 protected:
 	void SetUp() override;

@@ -192,6 +192,9 @@ Expr:
 	| SubExpr SEMICOL {
 		JT_TR("SubExpr;", PARSER_NOTIF);
 	}
+	| error {
+		JT_TR("Error semicol;", PARSER_NOTIF);
+	}
 %%
 
 int yyerror(jt::ParseContext* ctx, char* s) {

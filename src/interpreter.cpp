@@ -73,6 +73,39 @@ Var jt_get(CallUnit* unit, FuncTermImpl*, StringTermImpl* varname) {
 	return make_var(unit->get_var(varname->str()));
 }
 
+void LexerTest::SetUp() {
+	JT_TRACE(String() + "Running test " + ::testing::UnitTest::GetInstance()->current_test_info()->name());
+}
+
+void LexerTest::TearDown() {
+	JT_TRACE("\n------------------------------------------------------------------\n");
+}
+
+void LexerTest::test(const char* str, std::vector<Lexeme> lexems) {
+	size_t size = strlen(str);
+	Lexer lexer(str, str + size, 1, 1);
+
+	std::vector<Lexeme> parsed;
+
+	Token tok;
+	do {
+		lexer.next_lexeme(&tok);
+		if (tok.lex != SPACE)
+			parsed.push_back(tok.lex);
+	}
+	while (tok.lex != UNKNOWN && !lexer.finished());
+
+	if (parsed.size() != lexems.size())
+		JT_DBG_BREAK;
+	ASSERT_EQ(parsed.size(), lexems.size());
+
+	for (size_t i = 0; i < lexems.size(); ++i) {
+		if (lexems[i] != parsed[i])
+			JT_DBG_BREAK;
+		ASSERT_EQ(lexems[i], parsed[i]);
+	}
+}
+
 void BaseEnv::setup_env() {
 	ctx_    = std::make_shared<Context>(nullptr);
 	root_   = std::make_unique<FuncTermImpl>();

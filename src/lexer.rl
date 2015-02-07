@@ -13,11 +13,15 @@ write data;
 
 intlit = digit+;
 
+ws = [ \t];
+
 number = (intlit);
 	
 newline = ('\n');
 
-ws = [ \t];
+action cmd_err {
+	JT_TR("command error\n", PARSER_NOTIF); 
+}
 	
 main := |*
 
@@ -35,7 +39,7 @@ main := |*
 		tok->ident = std::string(ts, te);
 		tok->lex  = STR; fbreak; };
 
-	([a-zA-Z0-9_])+ => { 
+	[a-zA-Z_][a-zA-Z_0-9]* => { 
 		tok->ident = std::string(ts, te);
 		tok->lex  = IDENT; fbreak; };
 	';'
@@ -87,6 +91,10 @@ void Lexer::next_lexeme(Token* tok) {
 	tok->line = line_;
 	tok->col  = col_;
 	col_ = p - line_beg_ + 1;
+}
+
+bool Lexer::finished() const {
+	return p == eof;
 }
 
 } // namespace jt {
