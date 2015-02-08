@@ -1,5 +1,6 @@
 
 #include "llvm.h"
+#include <cctype>
 
 namespace jt {
 
@@ -7,6 +8,7 @@ Assembly::Assembly() {}
 
 void Assembly::open(const String& filename) {
 	out_.open(filename.c_str());
+	gen_.open(out_);
 }
 
 void Assembly::next(Node node, String& out) {
@@ -91,11 +93,11 @@ void Assembly::push(Node node) {
 
 	*this << 
 	"ret i32 0" <<
-	"} ; define i32 @main() {\n";
+	"}\n";
 }
 
 Assembly& Assembly::operator << (const String& str) {
-	out_ << str << "\n";
+	gen_.print(str.c_str()).endl();
 	return *this;
 }
 
@@ -111,5 +113,58 @@ String Assembly::var(const String& name) {
 	else
 		return "%" + name;
 }
+
+FormattedOutput::FormattedOutput(std::ostream& out)
+:	out_(&out) {}
+
+void FormattedOutput::open(std::ostream& out) {
+	out_ = &out;
+}
+
+FormattedOutput& FormattedOutput::operator << (const char* str) {
+	return *this;
+}
+
+FormattedOutput& FormattedOutput::print(const char* str) {
+	return print(str, strlen(str));
+}
+
+FormattedOutput& FormattedOutput::print(const char* str, size_t len) {
+	for (size_t i = 0; i < len; ++i) {
+		if (str[i] == '{') {
+			line_ << '{';
+			++offset_;
+			endl();
+		}
+		else if (str[i] == '}') {
+			endl();
+			--offset_;
+			print_offset();
+			line_ << '}';
+			endl();
+		}
+		else {
+			if (line_.str().empty() && !std::isspace(str[i])) {
+				print_offset();
+				line_ << str[i];
+			}
+			else if (!line_.str().empty())
+				line_ << str[i];
+		}
+	}
+	return *this;
+}
+
+void FormattedOutput::print_offset(int plus_offset) {
+	for (int off = 0; off < offset_ + plus_offset; ++off)
+		line_ << "  ";
+}
+
+FormattedOutput& FormattedOutput::endl() {
+	*out_ << line_.str() << std::endl;
+	line_.str("");
+	return *this;
+}
+
 
 } // namespace jt {

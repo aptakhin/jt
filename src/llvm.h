@@ -7,6 +7,31 @@
 
 namespace jt {
 
+class FormattedOutput {
+public:
+	FormattedOutput() = default;
+	FormattedOutput(std::ostream& out);
+
+	void open(std::ostream& out);
+
+	FormattedOutput& print(const char* str);
+	FormattedOutput& print(const char* str, size_t len);
+
+	FormattedOutput& endl();
+
+	FormattedOutput& operator << (const char* str);
+
+private:
+	void print_offset(int offset = 0);
+	
+private:
+	std::ostream* out_ = nullptr;
+
+	std::ostringstream line_;
+
+	int offset_ = 0;
+};
+
 class Assembly {
 public:
 	Assembly();
@@ -26,6 +51,8 @@ private:
 
 private:
 	std::ofstream out_;
+
+	FormattedOutput gen_;
 
 	size_t counter_ = 0;
 };
