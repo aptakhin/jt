@@ -55,12 +55,14 @@ typedef struct YYLTYPE
 %token FIG_CLOSE
 %token EQUAL
 %token PLUS
+%token MINUS
 %token MUL
 %token <str> IDENT
 %token <str> STR
 %token <i> NUMBER
 
 %left PLUS
+%left MINUS
 %left MUL 
 %left EQUAL
 
@@ -134,6 +136,14 @@ AtomExpr:
 		JT_TR(jt::String() + "Number " + std::to_string($1), PARSER_NOTIF);
 		ctx->put_var($1);
 	}
+	| PLUS NUMBER {
+		JT_TR(jt::String() + "+Number " + std::to_string($2), PARSER_NOTIF);
+		ctx->put_var($2);
+	}
+	| MINUS NUMBER {
+		JT_TR(jt::String() + "-Number " + std::to_string(-$2), PARSER_NOTIF);
+		ctx->put_var(-$2);
+	}
 	| STR {
 		JT_TR(jt::String() + "Str " + $1, PARSER_NOTIF);
 		ctx->put_var($1);
@@ -146,11 +156,11 @@ AtomExpr:
 SubExpr:
 	AtomExpr {}
 	| SubExpr PLUS SubExpr {
-		JT_TR("SubExpr + AtomExpr", PARSER_NOTIF);
+		JT_TR("SubExpr + SubExpr", PARSER_NOTIF);
 		ctx->put_func_call_all("op_plus", 2);
 	}
 	| SubExpr MUL SubExpr {
-		JT_TR("SubExpr * AtomExpr", PARSER_NOTIF);
+		JT_TR("SubExpr * SubExpr", PARSER_NOTIF);
 		ctx->put_func_call_all("op_mul", 2);
 	}
 
@@ -192,7 +202,7 @@ Expr:
 	| SubExpr SEMICOL {
 		JT_TR("SubExpr;", PARSER_NOTIF);
 	}
-	| error {
+	| error SEMICOL {
 		JT_TR("Error semicol;", PARSER_NOTIF);
 	}
 %%

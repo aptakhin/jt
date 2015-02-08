@@ -81,7 +81,7 @@ void LexerTest::TearDown() {
 	JT_TRACE("\n------------------------------------------------------------------\n");
 }
 
-void LexerTest::test(const char* str, std::vector<Lexeme> lexems) {
+void LexerTest::lex(const char* str, std::vector<Lexeme> lexems) {
 	size_t size = strlen(str);
 	Lexer lexer(str, str + size, 1, 1);
 

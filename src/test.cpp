@@ -96,24 +96,21 @@ TEST(Common, Lexer) {
 }
 
 TEST_F(LexerTest, Numbers) {
-	test(
-		"x0z = 5;" 
+	lex("x0z = 5;" 
 		"x = 1 + 2;",
 		{IDENT, EQUAL, NUMBER, SEMICOL, 
 		IDENT, EQUAL, NUMBER, PLUS, NUMBER, SEMICOL}
 	);
 }
 
-TEST_F(LexerTest, DISABLED_NumbersExps) {
-	test(
-		"x = 1 + -2;",
-		{IDENT, EQUAL, NUMBER, PLUS, NUMBER, SEMICOL}
+TEST_F(LexerTest, NumbersExps) {
+	lex("x = 1 + -2;",
+		{IDENT, EQUAL, NUMBER, PLUS, MINUS, NUMBER, SEMICOL}
 	);
 }
 
 TEST_F(LexerTest, SimpleFunc) {
-	test(
-		"def func() {" 
+	lex("def func() {" 
 		"  x = 5;" 
 		"}",
 		{DEF, IDENT, CIRC_OPEN, CIRC_CLOSE, FIG_OPEN, 
@@ -123,8 +120,7 @@ TEST_F(LexerTest, SimpleFunc) {
 }
 
 TEST_F(LexerTest, FuncInFunc) {
-	test(
-		"def func() {"
+	lex("def func() {"
 		"  def other(name int) int { name; }"
 		"  x = 5;" 
 		"}",

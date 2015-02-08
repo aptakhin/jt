@@ -56,6 +56,8 @@ main := |*
 		=> { tok->lex = FIG_CLOSE; fbreak; };
 	'+'
 		=> { tok->lex = PLUS; fbreak; };
+	'-'
+		=> { tok->lex = MINUS; fbreak; };
 	'*'
 		=> { tok->lex = MUL; fbreak; };
 	'='

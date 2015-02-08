@@ -90,7 +90,7 @@ protected:
 
 	void TearDown() override;
 
-	void test(const char* str, std::vector<Lexeme> lexems);
+	void lex(const char* str, std::vector<Lexeme> lexems);
 };
 
 class BaseTest : public ::testing::Test, public BaseEnv {
