@@ -14,10 +14,10 @@ class Interpreter:
 		if isinstance(gen_llvm, str):
 			cmd.append('--gen_llvm')
 			cmd.append(gen_llvm)
-		self.proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		self.proc = subprocess.Popen(' '.join(cmd), shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 	def run(self, cmd):
-		out, err = self.proc.communicate(input=bytes(cmd, 'utf-8'))
+		out, err = self.proc.communicate(input=cmd)
 
 		lines = []
 		for line in out.decode('utf-8').strip().split('\n'):
@@ -42,7 +42,8 @@ class Test:
 
 if __name__ == '__main__':
 	jt_bin = sys.argv[1] if len(sys.argv) >= 2 else 'jt'
-	jt_bin = '../build/clang-3.7/jt'
+	jt_bin = '../proj/clang-3.7/jt'
+
 
 	llvm_path = '/opt/local/libexec/llvm-3.7/bin/'
 	llvm_as  = os.path.join(llvm_path, 'llvm-as')
@@ -53,6 +54,8 @@ if __name__ == '__main__':
 	debug_test = None #'simple-func.txt'
 
 	run_dir = os.path.dirname(os.path.realpath(__file__))
+	jt_bin = os.path.normpath(os.path.join(run_dir, jt_bin))
+
 	reports_dir = os.path.join(run_dir, 'reports')
 	if not os.path.exists(reports_dir):
 		os.makedirs(reports_dir)
@@ -77,30 +80,30 @@ if __name__ == '__main__':
 			out_res = interp.run(test.input)
 
 			if test.output != out_res:
-				print('Test %s own interpreter failed' % test_file)
+				print('FAIL %s own interpreter' % test_file)
 				print('  Expected %s, got %s' % (test.output, out_res))
 			else:
-				print('Test %s own interpreter passed' % test_file)
+				print('  OK %s own interpreter' % test_file)
 		except:
-			print('Test %s own interpreter failed' % test_file, traceback.format_exc())
+			print('FAIL %s own interpreter' % test_file, traceback.format_exc())
 
 		try:
-			subprocess.check_call([llvm_as, ll_assembly])
+			subprocess.check_call(llvm_as + ' ' + ll_assembly, shell=True)
 
-			lli = subprocess.Popen([llvm_lli, ll_assembly + '.bc'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			lli = subprocess.Popen(llvm_lli + ' ' + ll_assembly + '.bc', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			out_res, err = lli.communicate()
 			out_res = out_res.decode('utf-8').strip()
 
 			if test.output != out_res:
-				print('Test %s llvm interpreter failed' % test_file)
+				print('FAIL %s llvm interpreter' % test_file)
 				print('  Expected %s, got %s' % (test.output, out_res))
 			else:
-				print('Test %s llvm interpreter passed' % test_file)
+				print('  OK %s llvm interpreter' % test_file)
 		except:
-			print('Test %s llvm interpreter failed' % test_file, traceback.format_exc())
+			print('FAIL %s llvm interpreter' % test_file, traceback.format_exc())
 
 		try:
-			subprocess.check_call([llvm_llc, ll_assembly])
+			subprocess.check_call(llvm_llc + ' ' + ll_assembly, shell=True)
 
 		except:
-			print('Test %s llc failed' % test_file, traceback.format_exc())
+			print('FAIL %s llc' % test_file, traceback.format_exc())
