@@ -27,10 +27,10 @@ int main(int argc, char** argv) {
 	bool stream = false;
 	String gen_llvm;
 
-// #if JT_PLATFORM == JT_PLATFORM_WIN32
-// 	Win32DbgReportOut win32trace;
-// 	Rep.add_out(&win32trace);
-// #endif
+#if JT_PLATFORM == JT_PLATFORM_WIN32
+	Win32DbgReportOut win32trace;
+	Rep.add_out(&win32trace);
+#endif
 
 	//help();
 

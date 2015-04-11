@@ -83,10 +83,11 @@ RM=rm -f'''
 
 	print >>makefile, 'src/parser_gen.cpp: src/parser.y src/parser.h'
 	print >>makefile, '\t' + 'bison -d -o src/parser_gen.cpp src/parser.y'
+	print >>makefile, ''
 
 	print >>makefile, 'clean:'
 	print >>makefile, '\t' + 'rm -r', dst_dir
-
+	print >>makefile, ''
 	for i in procs:
 		i.write(makefile)
 		print >>makefile, ''

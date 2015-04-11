@@ -38,12 +38,10 @@ using cres_ptr = std::unique_ptr<T, std::function<void (T*)>>;
 #define JT_CONCAT_IMPL(a, b) a##b
 #define JT_CONCAT(a, b) JT_CONCAT_IMPL(a, b)
 
-const int JT_PLATFORM_MAC = 10;
-const int JT_PLATFORM_WIN32 = 32;
+#define JT_PLATFORM_MAC 10
+#define JT_PLATFORM_WIN32 32
 
 #ifdef _WIN32
-#	define NOMINMAX
-#	include <windows.h>
 #	define JT_PLATFORM JT_PLATFORM_WIN32
 #endif
 
