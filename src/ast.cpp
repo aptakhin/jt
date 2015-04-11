@@ -191,7 +191,7 @@ const TermImpl* Term::operator -> () const {
 	return impl_.get();
 }
 
-Var make_ivar(int i) {
+Var make_ivar(long i) {
 	Var v;
 	v->set_term(make_term<IntTermImpl>(i));
 	return v;

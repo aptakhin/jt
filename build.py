@@ -69,8 +69,20 @@ RM=rm -f'''
 	print >>makefile, 'all: jt'
 	print >>makefile, ''
 
-	print >>makefile, 'jt:', ' '.join((i.name for i in procs))
+	print >>makefile, 'jt:', ' '.join((i.name for i in procs)), 'lexer', 'parser'
 	print >>makefile, '\t$(CXX) $(CPPFLAGS) -g -Wall -pedantic -v -o', os.path.join(dst_dir, 'jt'), ' '.join((i.name for i in procs))#, '-l/opt/local/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/config-3.4m/libpython3.4.dylib'
+
+	print >>makefile, 'lexer: src/lexer_gen.cpp'
+	print >>makefile, '\t'
+
+	print >>makefile, 'src/lexer_gen.cpp: src/lexer.rl'
+	print >>makefile, '\t' + 'ragel -o src/lexer_gen.cpp src/lexer.rl'
+
+	print >>makefile, 'parser: src/parser_gen.cpp'
+	print >>makefile, '\t'
+
+	print >>makefile, 'src/parser_gen.cpp: src/parser.y src/parser.h'
+	print >>makefile, '\t' + 'bison -d -o src/parser_gen.cpp src/parser.y'
 
 	print >>makefile, 'clean:'
 	print >>makefile, '\t' + 'rm -r', dst_dir

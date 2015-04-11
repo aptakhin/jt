@@ -193,14 +193,14 @@ class IntTermImpl : public TermImpl {
 public:
 	static const TermType::Type TYPE = TermType::INT4;
 
-	IntTermImpl(int number = 0) : TermImpl(this), number_(number) {}
+	IntTermImpl(long number = 0) : TermImpl(this), number_(number) {}
 
 	virtual IntTermImpl* do_clone() const override { return new IntTermImpl(number_); }
 
-	int number() const { return number_; }
+	long number() const { return number_; }
 
 private:
-	int number_;
+	long number_;
 };
 
 class BoolTermImpl : public TermImpl {
@@ -368,7 +368,7 @@ private:
 };
 JT_FINISH_AST_NODE(Var)
 
-Var make_ivar(int i);
+Var make_ivar(long i);
 Var make_bvar(bool b);
 Var make_svar(const String& str);
 
