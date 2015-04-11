@@ -91,11 +91,6 @@ CallUnit::CallUnit(CallUnit* parent, FuncTermImpl& func, ContextSPtr ctx)
 	stack_.push_back(std::make_shared<Context>(ctx));
 }
 
-CallUnit::CallUnit(CallUnit&& mv)
-:	stack_(std::move(mv.stack_)),
-	parent_(mv.parent_),
-	func_(std::move(mv.func_)) {}
-
 void CallUnit::set_args(Seq args) {
 	auto v = begin(args);
 	JT_COMP_ASSERT(args->vars().size() == func_.args()->vars().size(), 

@@ -1,7 +1,6 @@
 #include "lexer.h"
 #include <cstdlib>
 #include <string>
-#include <tchar.h>
 
 namespace jt {
 

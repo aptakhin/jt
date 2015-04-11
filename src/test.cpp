@@ -124,7 +124,7 @@ public:
 
 	void setup_std(ContextSPtr ctx) {
 		Seq print_init_args;
-		Var v = make_ivar((int) &out_);
+		Var v = make_ivar(reinterpret_cast<long>(&out_));
 		v->set_name("stream");
 		print_init_args->add(v);
 		ctx->add_named("print",   def_func<IntTermImpl>(jt_print,  "to_print", print_init_args));
@@ -510,8 +510,10 @@ TEST(FileTest, Test0) {
 
 int main(int argc, char** argv) {
 	testing::InitGoogleTest(&argc, argv);
+#ifdef _WIN32
 	Win32DbgReportOut win32trace;
 	Rep.add_out(&win32trace);
+#endif
 	int result = RUN_ALL_TESTS();
 	if (result != 0)
 		int p = 0;

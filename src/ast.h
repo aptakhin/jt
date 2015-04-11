@@ -14,7 +14,7 @@ class CallUnit;
 
 class BadNodeCast : public std::logic_error {
 public:
-	BadNodeCast(const char* what) : std::logic_error(what) { _CrtDbgBreak(); }
+	BadNodeCast(const char* what) : std::logic_error(what) { JT_DBG_BREAK; }
 };
 
 /// \sa NodeTypeNames
@@ -63,9 +63,7 @@ public:
 	}
 
 	template <typename Impl>
-	bool is() const {
-		return base_impl_ && base_impl_->type() == Impl::TYPE;
-	}
+	bool is() const;
 
 	template <typename Impl>
 	Impl* as() {
@@ -117,21 +115,21 @@ private:
 #define JT_CAT_IMPL_(A, B) A ## B
 #define JT_CAT(A, B) JT_CAT_IMPL_(A, B)
 
-#define JT_AST_NODE(Name) \
-class  JT_CAT(Name, Impl);\
-class Name : public AstNodeGuard< JT_CAT(Name, Impl) >\
+#define JT_AST_NODE(Name) class JT_CAT(Name, Impl) : public NodeImpl
+
+#define JT_FINISH_AST_NODE(Name) class Name : public AstNodeGuard< JT_CAT(Name, Impl) >\
 {\
 	public:\
 	template <typename... Args>\
-	Name(Args... args) : AstNodeGuard(new JT_CAT(Name, Impl)(args...)) {}\
+	Name(Args... args) : AstNodeGuard(new JT_CAT(Name, Impl){args...}) {}\
 	\
+	Name() : AstNodeGuard(new JT_CAT(Name, Impl){} ) {}\
 	Name(JT_CAT(Name, Impl)* impl) : AstNodeGuard(impl) {}\
-	Name(Name&& mv) : AstNodeGuard(mv.impl()) {}\
+	/*Name(Name&& mv) : AstNodeGuard(mv.impl()) {}*/\
 	/*Name(const Name& cpy) : AstNodeGuard(const_cast<JT_CAT(Name, Impl)*>(cpy.impl())) {}*/\
 	/*template <>\
 	Name(const std::initializer_list<Node>& init) : AstNodeGuard(new JT_CAT(Name, Impl)(init)) {}*/\
 };\
-class JT_CAT(Name, Impl) : public NodeImpl
 
 class Term;
 
@@ -340,6 +338,11 @@ private:
 	Term term_;
 };
 
+template <typename Impl>
+bool Node::is() const {
+	return base_impl_ && base_impl_->type() == Impl::TYPE;
+}
+
 JT_AST_NODE(Var) {
 public:
 	static const NodeType TYPE = NodeType::VAR;
@@ -361,6 +364,7 @@ private:
 
 	Node value_ = nullptr;
 };
+JT_FINISH_AST_NODE(Var)
 
 Var make_ivar(int i);
 Var make_bvar(bool b);
@@ -396,6 +400,7 @@ public:
 protected:
 	std::vector<Node> flow_;
 };
+JT_FINISH_AST_NODE(Flow)
 
 std::vector<Node>::iterator begin(Flow& f);
 std::vector<Node>::iterator end(Flow& f);
@@ -426,29 +431,13 @@ public:
 protected:
 	std::vector<Var> seq_;
 };
+JT_FINISH_AST_NODE(Seq)
 
 std::vector<Var>::iterator begin(Seq& s);
 std::vector<Var>::iterator end(Seq& s);
 
 std::vector<Var>::const_iterator begin(const Seq& s);
 std::vector<Var>::const_iterator end(const Seq& s);
-
-class Modifier {
-public:
-	Modifier(const String& name, Seq args)
-	:	name_(name),
-		args_(args) {}
-
-protected:
-	const String name_;
-	Seq args_;
-};
-
-class TemplateMod : public Modifier {
-public:
-	TemplateMod(Seq args)
-	:	Modifier("Template", args) {}
-};
 
 JT_AST_NODE(FuncCall) {
 public:
@@ -485,6 +474,7 @@ protected:
 	const String func_name_;
 	Flow flow_;
 };
+JT_FINISH_AST_NODE(FuncCall)
 
 typedef Var(*JtNative) (Seq);
 
@@ -525,7 +515,7 @@ public:
 	:	call_(&func_map_seq<A1, A2>), native_func_((Store) native_func) {}
 
 	Var call(CallUnit* unit, FuncTermImpl* parent_func, Seq args) {
-		return call_(native_func_, unit, parent_func, args);
+		return call_(reinterpret_cast<void*>(native_func_), unit, parent_func, args);
 	}
 
 private:
@@ -556,6 +546,7 @@ protected:
 	NativeCall native_;
 	Seq args_;
 };
+JT_FINISH_AST_NODE(NativeFuncCall)
 
 class FuncTermImpl : public TermImpl {
 public:
@@ -611,6 +602,7 @@ protected:
 	Node then_;
 	Node other_;
 };
+JT_FINISH_AST_NODE(If)
 
 class AstPrinter : public IVisitor {
 public:

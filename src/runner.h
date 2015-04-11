@@ -42,8 +42,6 @@ public:
 
 	CallUnit(const CallUnit&) = delete;
 
-	CallUnit(CallUnit&&);
-
 	void set_args(Seq args);
 
 	Flow flow();

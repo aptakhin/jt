@@ -15,27 +15,34 @@
 #include <vector>
 #include <fstream>
 
-#define NOMINMAX
-#include <windows.h>
+#ifdef _WIN32
+#	define NOMINMAX
+#	include <windows.h>
+#	define JT_DBG_BREAK _CrtDbgBreak()
+#endif
+
+#ifndef JT_DBG_BREAK
+#	define JT_DBG_BREAK
+#endif
 
 namespace jt {
 
-typedef std::int8_t   i1;
-typedef std::int16_t  i2;
-typedef std::int32_t  i4;
-typedef std::int64_t  i8;
+typedef int8_t   i1;
+typedef int16_t  i2;
+typedef int32_t  i4;
+typedef int64_t  i8;
 
-typedef std::uint8_t  u1;
-typedef std::uint16_t u2;
-typedef std::uint32_t u4;
-typedef std::uint64_t u8;
+typedef uint8_t  u1;
+typedef uint16_t u2;
+typedef uint32_t u4;
+typedef uint64_t u8;
 
 typedef float    r4;
 typedef double   r8;
 
 typedef std::string String;
 
-#define assert(Expr) { if (!(Expr)) { _CrtDbgBreak(); } }
+#define assert(Expr) { if (!(Expr)) { JT_DBG_BREAK; } }
 
 #define JT_CONCAT_IMPL(a, b) a##b
 #define JT_CONCAT(a, b) JT_CONCAT_IMPL(a, b)
@@ -135,8 +142,8 @@ public:
 
 	Optional(NulloptT) {}
 
-	explicit Optional(Optional&& opt)
-	:	store_(std::move(opt.store_)) {}
+	//explicit Optional(Optional&& opt)
+	//:	store_(std::move(opt.store_)) {}
 
 	void operator = (const T& t) {
 		store_.set(t);

@@ -1,3 +1,5 @@
 proj
 wintools
 llvm-sandbox
+build
+Makefile
