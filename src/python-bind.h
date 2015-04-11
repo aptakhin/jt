@@ -28,16 +28,18 @@ protected:
 	String module_name_;
 	String func_name_;
 	Seq args_;
+	Term ret_;
 	cres_ptr<void> py_func_;
 	cres_ptr<void> py_module_;
-	Term ret_;
 };
 JT_FINISH_AST_NODE(PythonFuncCall) 
 
 class PyEnv {
 public:
 	PyEnv();
-	~PyEnv();
+
+protected:
+	cres_ptr<void> py_env_;
 };
 
 } // namespace jt {

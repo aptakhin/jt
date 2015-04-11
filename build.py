@@ -71,8 +71,7 @@ RM=rm -f''', file=makefile)
 	print('', file=makefile)
 
 	print('jt:', ' '.join((i.name for i in procs)), 'lexer', 'parser', file=makefile)
-	print('\t$(CXX) $(CPPFLAGS) -g -Wall -pedantic -v -o', os.path.join(dst_dir, 'jt'), ' '.join((i.name for i in procs)), file=makefile)
-	#, '-l/opt/local/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/config-3.4m/libpython3.4.dylib'
+	print('\t$(CXX) $(CPPFLAGS) -g -Wall -pedantic -v -o', os.path.join(dst_dir, 'jt'), ' '.join((i.name for i in procs)), '/opt/local/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/config-3.4m/libpython3.4.a', file=makefile)
 
 	print('lexer: src/lexer_gen.cpp', file=makefile)
 	print('\t', file=makefile)
