@@ -1,5 +1,5 @@
-%define api.pure
-%define api.push_pull "push"
+%define api.pure full
+%define api.push-pull push
 
 %code top 
 {
