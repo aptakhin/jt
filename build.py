@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from __future__ import print_function
 import os
 
 source = '''
@@ -26,9 +27,9 @@ class MkCommand:
 		self.cmds = []
 
 	def write(self, out):
-		print >>out, self.name + ': ' + ' '.join(self.deps)
+		print(self.name + ': ' + ' '.join(self.deps), file=out)
 		for cmd in self.cmds:
-			print >>out, '\t' + cmd
+			print('\t' + cmd, file=out)
 
 class MakefileGenerator:
 	def __init__(self, out):
@@ -52,11 +53,11 @@ def cxx_target(filename):
 	return cmd
 
 with open('Makefile', 'wt') as makefile:
-	print >>makefile, '''# built by builder
+	print('''# built by builder
 CXX=clang++
-RM=rm -f'''
+RM=rm -f''', file=makefile)
 
-	print >>makefile, 'CPPFLAGS=-std=c++14 -ferror-limit=1 -Wall -pedantic -I src -I', '/opt/local/Library/Frameworks/Python.framework/Versions/3.4/Headers'
+	print('CPPFLAGS=-std=c++14 -ferror-limit=1 -Wall -pedantic -I src -I', '/opt/local/Library/Frameworks/Python.framework/Versions/3.4/Headers', file=makefile)
 	source_files = source.split('\n')
 	procs = []
 	for source in source_files:
@@ -66,28 +67,29 @@ RM=rm -f'''
 		cmd = cxx_target(source)
 		procs.append(cmd)
 
-	print >>makefile, 'all: jt'
-	print >>makefile, ''
+	print('all: jt', file=makefile)
+	print('', file=makefile)
 
-	print >>makefile, 'jt:', ' '.join((i.name for i in procs)), 'lexer', 'parser'
-	print >>makefile, '\t$(CXX) $(CPPFLAGS) -g -Wall -pedantic -v -o', os.path.join(dst_dir, 'jt'), ' '.join((i.name for i in procs))#, '-l/opt/local/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/config-3.4m/libpython3.4.dylib'
+	print('jt:', ' '.join((i.name for i in procs)), 'lexer', 'parser', file=makefile)
+	print('\t$(CXX) $(CPPFLAGS) -g -Wall -pedantic -v -o', os.path.join(dst_dir, 'jt'), ' '.join((i.name for i in procs)), file=makefile)
+	#, '-l/opt/local/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/config-3.4m/libpython3.4.dylib'
 
-	print >>makefile, 'lexer: src/lexer_gen.cpp'
-	print >>makefile, '\t'
+	print('lexer: src/lexer_gen.cpp', file=makefile)
+	print('\t', file=makefile)
 
-	print >>makefile, 'src/lexer_gen.cpp: src/lexer.rl'
-	print >>makefile, '\t' + 'ragel -o src/lexer_gen.cpp src/lexer.rl'
+	print('src/lexer_gen.cpp: src/lexer.rl', file=makefile)
+	print('\t' + 'ragel -o src/lexer_gen.cpp src/lexer.rl', file=makefile)
 
-	print >>makefile, 'parser: src/parser_gen.cpp'
-	print >>makefile, '\t'
+	print('parser: src/parser_gen.cpp', file=makefile)
+	print('\t', file=makefile)
 
-	print >>makefile, 'src/parser_gen.cpp: src/parser.y src/parser.h'
-	print >>makefile, '\t' + 'bison -d -o src/parser_gen.cpp src/parser.y'
-	print >>makefile, ''
+	print('src/parser_gen.cpp: src/parser.y src/parser.h', file=makefile)
+	print('\t' + 'bison -d -o src/parser_gen.cpp src/parser.y', file=makefile)
+	print('', file=makefile)
 
-	print >>makefile, 'clean:'
-	print >>makefile, '\t' + 'rm -r', dst_dir
-	print >>makefile, ''
+	print('clean:', file=makefile)
+	print('\t' + 'rm -r', dst_dir, file=makefile)
+	print('', file=makefile)
 	for i in procs:
 		i.write(makefile)
-		print >>makefile, ''
+		print('', file=makefile)

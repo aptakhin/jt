@@ -1,19 +1,10 @@
+#!/usr/bin/python
+from __future__ import print_function
 import subprocess
 import traceback
 import sys
 import glob
 import os
-from ctypes import windll
-kernel32 = windll.kernel32
-
-jt_bin = sys.argv[1] if len(sys.argv) >= 2 else 'jt'
-jt_bin = '../proj/vs13/Debug/jt'
-
-llvm_path = '../wintools/'
-llvm_as  = os.path.join(llvm_path, 'llvm-as')
-llvm_lli = os.path.join(llvm_path, 'lli')
-llvm_llc = os.path.join(llvm_path, 'llc')
-asm_bin = ''
 
 class Interpreter:
 	def __init__(self, source_filename=None, gen_llvm=None):
@@ -49,55 +40,67 @@ class Test:
 					continue
 				self.input += line
 
-debug_test = None #'simple-func.txt'
+if __name__ == '__main__':
+	jt_bin = sys.argv[1] if len(sys.argv) >= 2 else 'jt'
+	jt_bin = '../build/clang-3.7/jt'
 
-if debug_test:
-	test = Test(debug_test)
-	print ('Prepared test %s' % debug_test)
-	debug_file = os.path.join(os.path.dirname(jt_bin), '../jt-input.txt')
-	o = open(debug_file, 'w')
-	o.write(test.input)
-	o.close()
-	exit()
+	llvm_path = '/opt/local/libexec/llvm-3.7/bin/'
+	llvm_as  = os.path.join(llvm_path, 'llvm-as')
+	llvm_lli = os.path.join(llvm_path, 'lli')
+	llvm_llc = os.path.join(llvm_path, 'llc')
+	asm_bin = ''
 
-tests = glob.glob('*.txt')
-for test_file in tests:
-	try:
-		test = Test(test_file)
+	debug_test = None #'simple-func.txt'
 
-		reports_dir = 'reports'
-		if not os.path.exists(reports_dir):
-			os.makedirs(reports_dir)
+	run_dir = os.path.dirname(os.path.realpath(__file__))
+	reports_dir = os.path.join(run_dir, 'reports')
+	if not os.path.exists(reports_dir):
+		os.makedirs(reports_dir)
 
-		ll_assembly = os.path.join(reports_dir, os.path.basename(test_file) + '.as')
-		interp = Interpreter(gen_llvm=ll_assembly)
-		out_res = interp.run(test.input)
+	if debug_test:
+		test = Test(debug_test)
+		print('Prepared test %s' % debug_test)
+		debug_file = os.path.join(os.path.dirname(jt_bin), '../jt-input.txt')
+		o = open(debug_file, 'w')
+		o.write(test.input)
+		o.close()
+		exit()
 
-		if test.output != out_res:
-			print ('Test %s own interpreter failed' % test_file)
-			print ('  Expected %s, got %s' % (test.output, out_res))
-		else:
-			print ('Test %s own interpreter passed' % test_file)
-	except:
-		print ('Test %s own interpreter failed' % test_file, traceback.format_exc())
+	tests_wildcard = os.path.join(run_dir, '*.txt')
+	tests = glob.glob(tests_wildcard)
+	for test_file in tests:
+		try:
+			test = Test(test_file)
 
-	try:
-		subprocess.check_call([llvm_as, ll_assembly])
+			ll_assembly = os.path.join(reports_dir, os.path.basename(test_file) + '.as')
+			interp = Interpreter(gen_llvm=ll_assembly)
+			out_res = interp.run(test.input)
 
-		lli = subprocess.Popen([llvm_lli, ll_assembly + '.bc'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		out_res, err = lli.communicate()
-		out_res = out_res.decode('utf-8').strip()
+			if test.output != out_res:
+				print('Test %s own interpreter failed' % test_file)
+				print('  Expected %s, got %s' % (test.output, out_res))
+			else:
+				print('Test %s own interpreter passed' % test_file)
+		except:
+			print('Test %s own interpreter failed' % test_file, traceback.format_exc())
 
-		if test.output != out_res:
-			print ('Test %s llvm interpreter failed' % test_file)
-			print ('  Expected %s, got %s' % (test.output, out_res))
-		else:
-			print ('Test %s llvm interpreter passed' % test_file)
-	except:
-		print ('Test %s llvm interpreter failed' % test_file, traceback.format_exc())
+		try:
+			subprocess.check_call([llvm_as, ll_assembly])
 
-	try:
-		subprocess.check_call([llvm_llc, ll_assembly])
+			lli = subprocess.Popen([llvm_lli, ll_assembly + '.bc'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			out_res, err = lli.communicate()
+			out_res = out_res.decode('utf-8').strip()
 
-	except:
-		print ('Test %s llc failed' % test_file, traceback.format_exc())
+			if test.output != out_res:
+				print('Test %s llvm interpreter failed' % test_file)
+				print('  Expected %s, got %s' % (test.output, out_res))
+			else:
+				print('Test %s llvm interpreter passed' % test_file)
+		except:
+			print('Test %s llvm interpreter failed' % test_file, traceback.format_exc())
+
+		try:
+			subprocess.check_call([llvm_llc, ll_assembly])
+
+		except:
+			print('Test %s llc failed' % test_file, traceback.format_exc())
