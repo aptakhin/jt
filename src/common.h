@@ -53,25 +53,22 @@ template <class T>
 class TypeStorage {
 public:
 	TypeStorage()
-	:	stored_(false),
-		dbg_val_(nullptr) {}
+	:	stored_(false) {}
 
 	TypeStorage(T&& t)
 	:	stored_(true) {
 		new (&store_) T(std::move(t));
-		dbg_val_ = cast<const T*>();
 	}
 
 	TypeStorage(const T& t)
 	:	stored_(true) {
 		new (&store_) T(t);
-		dbg_val_ = cast<const T*>();
 	}
 
 	TypeStorage(const TypeStorage& t)
 	:	stored_(t.stored_) {
 		if (t.stored_)
-			new (&store_) T(*t), dbg_val_ = cast<const T*>();
+			new (&store_) T(*t);
 	}
 
 	~TypeStorage() {
@@ -82,7 +79,6 @@ public:
 		if (stored_) {
 			c_cast<T*>()->~T();
 			stored_ = false;
-			dbg_val_ = nullptr;
 		}
 	}
 
@@ -90,14 +86,12 @@ public:
 		reset();
 		new (&store_) T(std::move(t));
 		stored_ = true;
-		dbg_val_ = cast<const T*>();
 	}
 
 	void set(const T& t) {
 		reset();
 		new (&store_) T(t);
 		stored_ = true;
-		dbg_val_ = cast<const T*>();
 	}
 
 	T& operator * () {
@@ -123,7 +117,6 @@ private:
 
 private:
 	typename std::aligned_storage<sizeof(T), std::alignment_of<T>::value>::type store_;
-	const T* dbg_val_;
 
 	bool stored_;
 };

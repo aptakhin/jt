@@ -80,9 +80,9 @@ Lexer::Lexer(const char* p_, const char* pe_, int line, int col)
 	pe(pe_),
 	eof(pe_),
 	orig_(p_),
-	line_beg_(orig_),
 	line_(line),
-	col_(col) {
+	col_(col),
+	line_beg_(orig_) {
 	%% write init;
 }
 

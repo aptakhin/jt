@@ -1,5 +1,5 @@
 
-#line 1 "../src/lexer.rl"
+#line 1 "src/lexer.rl"
 #include "lexer.h"
 #include <cstdlib>
 #include <string>
@@ -7,7 +7,7 @@
 namespace jt {
 
 
-#line 9 "../src/lexer_gen.cpp"
+#line 11 "src/lexer_gen.cpp"
 static const char _Lexer_actions[] = {
 	0, 1, 0, 1, 1, 1, 6, 1, 
 	7, 1, 8, 1, 9, 1, 10, 1, 
@@ -97,7 +97,7 @@ static const int Lexer_error = 0;
 static const int Lexer_en_main = 3;
 
 
-#line 77 "../src/lexer.rl"
+#line 76 "src/lexer.rl"
 
 
 Lexer::Lexer(const char* p_, const char* pe_, int line, int col)
@@ -105,11 +105,11 @@ Lexer::Lexer(const char* p_, const char* pe_, int line, int col)
 	pe(pe_),
 	eof(pe_),
 	orig_(p_),
-	line_beg_(orig_),
 	line_(line),
-	col_(col) {
+	col_(col),
+	line_beg_(orig_) {
 	
-#line 107 "../src/lexer_gen.cpp"
+#line 113 "src/lexer_gen.cpp"
 	{
 	cs = Lexer_start;
 	ts = 0;
@@ -117,12 +117,12 @@ Lexer::Lexer(const char* p_, const char* pe_, int line, int col)
 	act = 0;
 	}
 
-#line 88 "../src/lexer.rl"
+#line 87 "src/lexer.rl"
 }
 
 void Lexer::next_lexeme(Token* tok) {
 	
-#line 116 "../src/lexer_gen.cpp"
+#line 126 "src/lexer_gen.cpp"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -143,7 +143,7 @@ _resume:
 #line 1 "NONE"
 	{ts = p;}
 	break;
-#line 135 "../src/lexer_gen.cpp"
+#line 147 "src/lexer_gen.cpp"
 		}
 	}
 
@@ -214,69 +214,69 @@ _eof_trans:
 	{te = p+1;}
 	break;
 	case 3:
-#line 28 "../src/lexer.rl"
+#line 27 "src/lexer.rl"
 	{act = 1;}
 	break;
 	case 4:
-#line 30 "../src/lexer.rl"
+#line 29 "src/lexer.rl"
 	{act = 2;}
 	break;
 	case 5:
-#line 42 "../src/lexer.rl"
+#line 41 "src/lexer.rl"
 	{act = 5;}
 	break;
 	case 6:
-#line 38 "../src/lexer.rl"
+#line 37 "src/lexer.rl"
 	{te = p+1;{ 
 		tok->ident = std::string(ts, te);
 		tok->lex  = STR; {p++; goto _out; } }}
 	break;
 	case 7:
-#line 46 "../src/lexer.rl"
+#line 45 "src/lexer.rl"
 	{te = p+1;{ tok->lex = SEMICOL; {p++; goto _out; } }}
 	break;
 	case 8:
-#line 48 "../src/lexer.rl"
+#line 47 "src/lexer.rl"
 	{te = p+1;{ tok->lex = COMMA; {p++; goto _out; } }}
 	break;
 	case 9:
-#line 50 "../src/lexer.rl"
+#line 49 "src/lexer.rl"
 	{te = p+1;{ tok->lex = CIRC_OPEN; {p++; goto _out; } }}
 	break;
 	case 10:
-#line 52 "../src/lexer.rl"
+#line 51 "src/lexer.rl"
 	{te = p+1;{ tok->lex = CIRC_CLOSE; {p++; goto _out; } }}
 	break;
 	case 11:
-#line 54 "../src/lexer.rl"
+#line 53 "src/lexer.rl"
 	{te = p+1;{ tok->lex = FIG_OPEN; {p++; goto _out; } }}
 	break;
 	case 12:
-#line 56 "../src/lexer.rl"
+#line 55 "src/lexer.rl"
 	{te = p+1;{ tok->lex = FIG_CLOSE; {p++; goto _out; } }}
 	break;
 	case 13:
-#line 58 "../src/lexer.rl"
+#line 57 "src/lexer.rl"
 	{te = p+1;{ tok->lex = PLUS; {p++; goto _out; } }}
 	break;
 	case 14:
-#line 60 "../src/lexer.rl"
+#line 59 "src/lexer.rl"
 	{te = p+1;{ tok->lex = MINUS; {p++; goto _out; } }}
 	break;
 	case 15:
-#line 62 "../src/lexer.rl"
+#line 61 "src/lexer.rl"
 	{te = p+1;{ tok->lex = MUL; {p++; goto _out; } }}
 	break;
 	case 16:
-#line 64 "../src/lexer.rl"
+#line 63 "src/lexer.rl"
 	{te = p+1;{ tok->lex = EQUAL; {p++; goto _out; } }}
 	break;
 	case 17:
-#line 66 "../src/lexer.rl"
+#line 65 "src/lexer.rl"
 	{te = p+1;{ tok->lex = SPACE; {p++; goto _out; } }}
 	break;
 	case 18:
-#line 68 "../src/lexer.rl"
+#line 67 "src/lexer.rl"
 	{te = p+1;{
 		line_beg_ = p + 1; // Skip new line character
 		++line_;
@@ -286,7 +286,7 @@ _eof_trans:
 	}}
 	break;
 	case 19:
-#line 32 "../src/lexer.rl"
+#line 31 "src/lexer.rl"
 	{te = p;p--;{
 		tok->lex = NUMBER;
 		tok->i   = std::atoi(std::string(ts, te).c_str());
@@ -294,7 +294,7 @@ _eof_trans:
 	}}
 	break;
 	case 20:
-#line 42 "../src/lexer.rl"
+#line 41 "src/lexer.rl"
 	{te = p;p--;{ 
 		tok->ident = std::string(ts, te);
 		tok->lex  = IDENT; {p++; goto _out; } }}
@@ -316,7 +316,7 @@ _eof_trans:
 	}
 	}
 	break;
-#line 287 "../src/lexer_gen.cpp"
+#line 320 "src/lexer_gen.cpp"
 		}
 	}
 
@@ -329,7 +329,7 @@ _again:
 #line 1 "NONE"
 	{ts = 0;}
 	break;
-#line 298 "../src/lexer_gen.cpp"
+#line 333 "src/lexer_gen.cpp"
 		}
 	}
 
@@ -349,7 +349,7 @@ _again:
 	_out: {}
 	}
 
-#line 92 "../src/lexer.rl"
+#line 91 "src/lexer.rl"
 	offset_ = p - orig_;
 	tok->line = line_;
 	tok->col  = col_;

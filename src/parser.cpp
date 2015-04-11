@@ -22,7 +22,7 @@ void Parser::push(const String& c) {
 	do {
 		YYSTYPE yylval;
 		memset(&yylval, 0, sizeof(yylval));
-		if (tokens_.empty() || !tokens_.empty() && tokens_.back().lex != UNKNOWN)
+		if (tokens_.empty() || (!tokens_.empty() && tokens_.back().lex != UNKNOWN))
 			tokens_.push_back(Token());
 		Token& tok = tokens_.back();
 		lexer.next_lexeme(&tok);
