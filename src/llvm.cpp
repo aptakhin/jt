@@ -77,7 +77,7 @@ void Assembly::push(Node node) {
 	"@.int_print = private unnamed_addr constant [3 x i8] c\"%d\\00\"" << 
 	"" <<
 	"define i32 @print_i(i32 %a) {" <<
-	"  %print_str = getelementptr [3 x i8]* @.int_print, i64 0, i64 0" <<
+	"  %print_str = getelementptr [3 x i8], [3 x i8]* @.int_print, i64 0, i64 0" <<
 	"  %tmp = tail call i32 (i8*, ...)* @printf(i8* %print_str, i32 %a)" <<
 	"  ret i32 0" <<
 	"}";
