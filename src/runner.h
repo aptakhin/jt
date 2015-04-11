@@ -48,13 +48,12 @@ public:
 	void set_flow(Flow flow);
 
 	Term exec();
+	Term exec_node(Node node);
 
 	Term get_var(const String& name);
 
 private:
 	void add_vars(Seq args);
-
-	Term exec_node(Node node);
 
 	Var resolve(Node node);
 	Seq resolve(Flow flow);

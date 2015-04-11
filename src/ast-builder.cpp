@@ -8,7 +8,7 @@ ParseState::ParseState()
 	var(nullptr) {}
 
 void ParseState::push(Node node) {
-	printf("-- ADD %d\n", node->type());
+	JT_TR(jt::String() + "-- ADD " + std::to_string(int(node->type())), PARSER_NOTIF);
 	flow->add(node);
 }
 
@@ -34,17 +34,17 @@ ParseState* ParseStates::operator -> () {
 }
 
 void ParseStates::push() {
-	printf("-- PUSH %d\n", states_.size());
+	JT_TR(jt::String() + "-- PUSH " + std::to_string(states_.size()), PARSER_NOTIF);
 	states_.push_back(ParseState());
 }
 
 void ParseStates::pop() {
 	states_.pop_back();
-	printf("-- POP\n");
+	JT_TR( "-- POP", PARSER_NOTIF);
 }
 
 void ParseStates::clear_flow() {
-	printf("-- CLEAR\n");
+	JT_TR( "-- CLEAR", PARSER_NOTIF);
 	states_.back().flow->flow().clear();
 }
 

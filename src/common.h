@@ -15,16 +15,6 @@
 #include <vector>
 #include <fstream>
 
-#ifdef _WIN32
-#	define NOMINMAX
-#	include <windows.h>
-#	define JT_DBG_BREAK _CrtDbgBreak()
-#endif
-
-#ifndef JT_DBG_BREAK
-#	define JT_DBG_BREAK
-#endif
-
 namespace jt {
 
 typedef int8_t   i1;
@@ -42,10 +32,24 @@ typedef double   r8;
 
 typedef std::string String;
 
-#define assert(Expr) { if (!(Expr)) { JT_DBG_BREAK; } }
+template<typename T>
+using cres_ptr = std::unique_ptr<T, std::function<void (T*)>>;
 
 #define JT_CONCAT_IMPL(a, b) a##b
 #define JT_CONCAT(a, b) JT_CONCAT_IMPL(a, b)
+
+const int JT_PLATFORM_MAC = 10;
+const int JT_PLATFORM_WIN32 = 32;
+
+#ifdef _WIN32
+#	define NOMINMAX
+#	include <windows.h>
+#	define JT_PLATFORM JT_PLATFORM_WIN32
+#endif
+
+#ifndef JT_PLATFORM
+#	define JT_PLATFORM JT_PLATFORM_MAC
+#endif
 
 template <class T>
 class TypeStorage {

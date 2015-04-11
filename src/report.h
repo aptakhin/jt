@@ -9,9 +9,17 @@
 namespace jt {
 
 enum class ReportLevel {
-	NOTIF = 1,
-	USER_ERR = 1 << 1,
-	COMP_ERR = 1 << 2
+	NOTIF        = 1,
+	LEXER_NOTIF  = 1 << 1,
+	PARSER_NOTIF = 1 << 2,
+	SYMANT_NOTIF = 1 << 3,
+	INFERR_NOTIF = 1 << 4,
+	INTERP_NOTIF = 1 << 5,
+	GENERN_NOTIF = 1 << 6,
+	PYTHON_NOTIF = 1 << 7,
+
+	USER_ERR  = 1 << 14,
+	COMP_ERR  = 1 << 15,
 };
 
 class Report {
@@ -50,7 +58,6 @@ protected:
 
 extern Reports Rep;
 
-
 class BaseReportFormatter {
 public:
 	static std::string format(const Report& report, int offset, bool show_file_path);
@@ -81,23 +88,33 @@ public:
 
 #define JT_TRACE_SCOPE(msg) JT_TRACE((msg)); OstreamReportOutScopeOffset JT_CONCAT(trace_scope_, __LINE__);
 
-#ifdef _WIN32
-class Win32DbgReportOut : public IReportOut {
-public:
-	Win32DbgReportOut() {}
-	virtual void out(const Report& report, int offset) override;
+// #if JT_PLATFORM == JT_PLATFORM_WIN32
 
-protected:
-	void out_impl(const Report& report, int offset);
-};
-#endif // #ifdef _WIN32
+// class Win32DbgReportOut : public IReportOut {
+// public:
+// 	Win32DbgReportOut() {}
+// 	virtual void out(const Report& report, int offset) override;
 
-#define JT_TRAP(cond) { if ((cond)) { JT_DBG_BREAK; } }
+// protected:
+// 	void out_impl(const Report& report, int offset);
+// };
+
+// #endif // #if JT_PLATFORM == JT_PLATFORM_WIN32
+
+//#if JT_PLATFORM == JT_PLATFORM_WIN32
+//#	define JT_DBG_BREAK { asm {int 3} }
+//#else
+#	define JT_DBG_BREAK { __asm__("int $3"); }
+//#endif // #if JT_PLATFORM == JT_PLATFORM_WIN32
+
+#define JT_TRAP(cond) { if ((cond)) { JT_DEBUG_BREAK; } }
+
 #define JT_COMP_ERR(msg) { Rep.report(Report(ReportLevel::COMP_ERR, __FILE__, __LINE__, (msg))); JT_DBG_BREAK; }
 #define JT_COMP_ASSERT(expr, msg) if (!(expr)){ JT_COMP_ERR(msg); }
 #define JT_TRACE(msg) { Rep.report(Report(ReportLevel::NOTIF, __FILE__, __LINE__, (msg))); }
 #define JT_USER_ERR(msg) { Rep.report(Report(ReportLevel::USER_ERR, __FILE__, __LINE__, (msg))); JT_DBG_BREAK; }
 
-#define JT_TEST_DBG_SEEK(test, seek) { if (String(::testing::UnitTest::GetInstance()->current_test_info()->name()) == test) { static unsigned counter = (seek); --counter; if (!counter) { JT_DBG_BREAK; }  } }
+#define JT_TR(msg, level) { jt::Rep.report(jt::Report(jt::ReportLevel::level, __FILE__, __LINE__, (msg))); }
+
 
 } // namespace jt {

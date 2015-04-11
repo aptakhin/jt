@@ -1,5 +1,9 @@
 proj
 wintools
 llvm-sandbox
+<<<<<<< HEAD
 build
 Makefile
+=======
+tests/reports
+>>>>>>> master

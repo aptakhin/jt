@@ -1,6 +1,7 @@
 
 #include "runner.h"
 #include "inferencer.h"
+#include "python-bind.h"
 
 namespace jt {
 
@@ -221,6 +222,15 @@ Term CallUnit::exec_node(Node node) {
 	}
 		break;
 
+	case NodeType::PYTHON_FUNC_CALL: {
+		auto call = node.impl<PythonFuncCallImpl>();
+		auto push_args = bind(call->args());
+		auto ret = call->do_call(this, &func_, push_args);
+		if (ret->term())
+			tm = ret->term();
+	}
+		break;
+
 	case NodeType::VAR: {
 		auto var  = node.impl<VarImpl>();
 		auto calc = resolve(node);
@@ -241,7 +251,7 @@ Term CallUnit::exec_node(Node node) {
 			Node next_exec = cond->boolean()? branch->then() : branch->other();
 			if (next_exec) {
 				// TODO: context stack push!
-				exec_node(next_exec);
+				tm = exec_node(next_exec);
 			}	
 		}
 		stack_.pop_back();

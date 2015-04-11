@@ -1,6 +1,14 @@
 {
 'target_defaults': {
 	'default_configuration': 'Release',
+	"include_dirs": [
+		"include", "C:/Users/Alex/Assembling/Python-3.4.2/Include"
+	],
+	"link_settings": {
+		"libraries": [
+			"-lpython3.lib",
+		]
+	},
 	'configurations': {
 		'Debug': {
 			'defines': [ 'DEBUG', '_DEBUG' ],
@@ -14,6 +22,9 @@
 					'EnableCOMDATFolding': 2,
 					'LinkIncremental': 1,
 					'GenerateDebugInformation': 'true',
+					'AdditionalLibraryDirectories': [
+						"../../wintools/lib/",
+					],
 				},        
 			},
 		},
@@ -34,7 +45,10 @@
 					'LinkTimeCodeGeneration': 1,
 					'OptimizeReferences': 2,
 					'EnableCOMDATFolding': 2,
-					'LinkIncremental': 1,          
+					'LinkIncremental': 1,  
+					'AdditionalLibraryDirectories': [
+						"../../wintools/lib/",
+					],        
 				},
 			},
 		},

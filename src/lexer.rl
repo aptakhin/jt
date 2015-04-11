@@ -12,11 +12,15 @@ write data;
 
 intlit = digit+;
 
+ws = [ \t];
+
 number = (intlit);
 	
 newline = ('\n');
 
-ws = ([ \t])+;
+action cmd_err {
+	JT_TR("command error\n", PARSER_NOTIF); 
+}
 	
 main := |*
 
@@ -34,7 +38,7 @@ main := |*
 		tok->ident = std::string(ts, te);
 		tok->lex  = STR; fbreak; };
 
-	([a-zA-Z0-9_])+ => { 
+	[a-zA-Z_][a-zA-Z_0-9]* => { 
 		tok->ident = std::string(ts, te);
 		tok->lex  = IDENT; fbreak; };
 	';'
@@ -51,6 +55,8 @@ main := |*
 		=> { tok->lex = FIG_CLOSE; fbreak; };
 	'+'
 		=> { tok->lex = PLUS; fbreak; };
+	'-'
+		=> { tok->lex = MINUS; fbreak; };
 	'*'
 		=> { tok->lex = MUL; fbreak; };
 	'='
@@ -69,12 +75,14 @@ main := |*
 
 }%%
 
-Lexer::Lexer(const char* p_, const char* pe_)
+Lexer::Lexer(const char* p_, const char* pe_, int line, int col)
 :	p(p_),
 	pe(pe_),
 	eof(pe_),
 	orig_(p_),
-	line_beg_(orig_) {
+	line_beg_(orig_),
+	line_(line),
+	col_(col) {
 	%% write init;
 }
 
@@ -83,7 +91,11 @@ void Lexer::next_lexeme(Token* tok) {
 	offset_ = p - orig_;
 	tok->line = line_;
 	tok->col  = col_;
-	col_ = p - line_beg_;
+	col_ = p - line_beg_ + 1;
+}
+
+bool Lexer::finished() const {
+	return p == eof;
 }
 
 } // namespace jt {

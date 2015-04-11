@@ -26,6 +26,7 @@ enum class NodeType {
 	FUNC,
 	FUNC_CALL,
 	NATIVE_FUNC_CALL,
+	PYTHON_FUNC_CALL, // \sa definition python-bind.h
 	IF,
 };
 
@@ -38,6 +39,7 @@ static const char* NodeTypeNames[] = {
 	"Func",
 	"FuncCall",
 	"NativeFuncCall",
+	"PythonFuncCall",
 	"If"
 };
 
@@ -77,7 +79,7 @@ public:
 
 	template <typename Impl>
 	Impl* impl() {
-		assert(is<Impl>());
+		JT_COMP_ASSERT(is<Impl>(), "Wrong type!");
 		return reinterpret_cast<Impl*>(base_impl_);
 	}
 
@@ -481,7 +483,6 @@ typedef Var(*JtNative) (Seq);
 template <typename A1>
 Var func_map_seq(void* func, CallUnit* unit, FuncTermImpl* parent, Seq args) {
 	JT_COMP_ASSERT(args->vars().size() == 1, "Must set only 1 argument");
-	assert(args->vars().size() == 1);
 	typedef Var(*NativeFunc) (CallUnit*, FuncTermImpl*, A1*);
 	NativeFunc native_func = (NativeFunc) func;
 	auto a0 = args->vars()[0]->term().impl<A1>();
@@ -498,6 +499,8 @@ Var func_map_seq(void* func, CallUnit* unit, FuncTermImpl* parent, Seq args) {
 	return native_func(unit, parent, a0, a1);
 }
 
+Var func_simple_seq(void* func, CallUnit* unit, FuncTermImpl* parent, Seq args);
+
 class NativeCall {
 public:
 	typedef Var (*NativeMapper) (void* func, CallUnit* unit, FuncTermImpl* parent, Seq args);
@@ -507,12 +510,16 @@ public:
 	:	call_(nullptr), native_func_(nullptr) {}
 
 	template <typename A1>
+	NativeCall(Var (*native_func)(CallUnit*, FuncTermImpl*, Seq))
+	:	call_(&func_simple_seq), native_func_(Store(native_func)) {}
+
+	template <typename A1>
 	NativeCall(Var (*native_func)(CallUnit*, FuncTermImpl*, A1*))
-	:	call_(&func_map_seq<A1>), native_func_((Store) native_func) {}
+	:	call_(&func_map_seq<A1>), native_func_(Store(native_func)) {}
 
 	template <typename A1, typename A2>
 	NativeCall(Var (*native_func)(CallUnit*, FuncTermImpl*, A1*, A2*))
-	:	call_(&func_map_seq<A1, A2>), native_func_((Store) native_func) {}
+	:	call_(&func_map_seq<A1, A2>), native_func_(Store(native_func)) {}
 
 	Var call(CallUnit* unit, FuncTermImpl* parent_func, Seq args) {
 		return call_(reinterpret_cast<void*>(native_func_), unit, parent_func, args);
@@ -572,7 +579,6 @@ private:
 	Seq  args_;
 	Flow flow_;
 	Var  ret_;
-
 	Seq  init_args_;
 };
 
@@ -620,31 +626,6 @@ protected:
 	std::ostream& out_;
 
 	int offset_;
-};
-
-class AstNodeCalls {
-public:
-	template <class N>
-	void add(N node) {}
-
-	template <class N>
-	void call(N node) {}
-
-private:
-	//std::vector<>
-};
-
-class AstChecker : public IVisitor {
-public:
-	AstChecker();
-
-	virtual void caption(const char* title) override;
-	virtual void caption(const char* title1, const char* title2) override;
-	virtual void visit(const char* title, const Node& node) override;
-	virtual void visit_term(const char* title, const Term& term) override;
-
-protected:
-	AstNodeCalls checks_;
 };
 
 } // namespace jt {

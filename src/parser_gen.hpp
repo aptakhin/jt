@@ -65,10 +65,11 @@ class ParseContext;
      FIG_CLOSE = 268,
      EQUAL = 269,
      PLUS = 270,
-     MUL = 271,
-     IDENT = 272,
-     STR = 273,
-     NUMBER = 274
+     MINUS = 271,
+     MUL = 272,
+     IDENT = 273,
+     STR = 274,
+     NUMBER = 275
    };
 #endif
 
@@ -87,7 +88,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 91 "../src/parser_gen.hpp"
+#line 92 "../src/parser_gen.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -142,4 +143,4 @@ typedef struct YYLTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 146 "../src/parser_gen.hpp"
+#line 147 "../src/parser_gen.hpp"

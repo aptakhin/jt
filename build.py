@@ -7,13 +7,16 @@ src/ast.cpp
 src/common.cpp
 src/gtest/gtest-all.cc
 src/inferencer.cpp
+src/interpreter.cpp
 src/llvm.cpp
 src/lexer_gen.cpp
 src/parser.cpp
 src/parser_gen.cpp
+src/python-bind.cpp
 src/report.cpp
 src/runner.cpp
 src/test.cpp
+src/main.cpp
 '''
 
 class MkCommand:
@@ -51,9 +54,9 @@ def cxx_target(filename):
 with open('Makefile', 'wt') as makefile:
 	print >>makefile, '''# built by builder
 CXX=clang++
-RM=rm -f
-CPPFLAGS=-std=c++14 -ferror-limit=1 -I src
-'''
+RM=rm -f'''
+
+	print >>makefile, 'CPPFLAGS=-std=c++14 -ferror-limit=1 -Wall -pedantic -I src -I', '/opt/local/Library/Frameworks/Python.framework/Versions/3.4/Headers'
 	source_files = source.split('\n')
 	procs = []
 	for source in source_files:
@@ -67,7 +70,7 @@ CPPFLAGS=-std=c++14 -ferror-limit=1 -I src
 	print >>makefile, ''
 
 	print >>makefile, 'jt:', ' '.join((i.name for i in procs))
-	print >>makefile, '\t$(CXX) $(CPPFLAGS) -g -o', os.path.join(dst_dir, 'jt'), ' '.join((i.name for i in procs))
+	print >>makefile, '\t$(CXX) $(CPPFLAGS) -g -Wall -pedantic -v -o', os.path.join(dst_dir, 'jt'), ' '.join((i.name for i in procs))#, '-l/opt/local/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/config-3.4m/libpython3.4.dylib'
 
 	print >>makefile, 'clean:'
 	print >>makefile, '\t' + 'rm -r', dst_dir
