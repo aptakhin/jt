@@ -38,16 +38,22 @@ using cres_ptr = std::unique_ptr<T, std::function<void (T*)>>;
 #define JT_CONCAT_IMPL(a, b) a##b
 #define JT_CONCAT(a, b) JT_CONCAT_IMPL(a, b)
 
-#define JT_PLATFORM_MAC 10
-#define JT_PLATFORM_WIN32 32
-
 #ifdef _WIN32
-#	define JT_PLATFORM JT_PLATFORM_WIN32
+#	define JT_PLATFORM_WIN32 1
+#else
+#	define JT_PLATFORM_WIN32 0
 #endif
 
-#ifndef JT_PLATFORM
-#	define JT_PLATFORM JT_PLATFORM_MAC
+#if !JT_PLATFORM_WIN32
+#	define JT_PLATFORM_MAC 1
+#else
+#	define JT_PLATFORM_MAC 0
 #endif
+
+#if JT_PLATFORM_WIN32 + JT_PLATFORM_MAC > 1
+#	error "Too many platforms activated"
+#endif
+
 
 template <class T>
 class TypeStorage {
