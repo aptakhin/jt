@@ -3,7 +3,7 @@ Jt is small sandbox static-typed language without garbage collector. So, welcome
 ## Example
 
 	def double(a) {
-		a + a;
+	    a + a;
 	}
 
 Calculating `а` type when use ```double```:
