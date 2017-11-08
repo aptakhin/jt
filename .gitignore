@@ -1,6 +1,4 @@
+.idea
 proj
-wintools
-llvm-sandbox
-build
-Makefile
-tests/reports
+cmake-build-*
+events.json
